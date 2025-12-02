@@ -1,0 +1,356 @@
+/* GLOBAL */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  font-family: "Poppins", sans-serif;
+  background: #fff;
+  color: #333;
+}
+
+a {
+  text-decoration: none;
+}
+
+/* HEADER */
+.header {
+  width: 100%;
+  padding: 5px 0;
+  background: #2d2a30 !important;
+  /* backdrop-filter: blur(6px); */
+  position: fixed;
+  top: 0;
+  z-index: 999;
+}
+
+.header-container {
+  max-width: 1300px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+}
+
+.logo-img {
+  height: 180px;
+  margin-right: 20px;
+  margin-top: -40px; /* pull logo upward */
+  margin-bottom: -40px;
+}
+
+.brand-name {
+  color: #daa425;
+  font-weight: 700;
+  font-size: 32px;
+  letter-spacing: 2px;
+}
+
+.brand-tagline {
+  color: #daa425;
+  font-size: 16px;
+  margin-top: 5px;
+  opacity: 0.8;
+}
+
+.navbar-menu {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.navbar-menu a {
+  color: white;
+  font-size: 14px;
+  text-transform: uppercase;
+  transition: 0.3s;
+}
+
+.navbar-menu a:hover {
+  color: #daa425;
+}
+
+.nav-icon {
+  margin-left: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: white;
+  transition: 0.2s;
+}
+
+.nav-icon:hover {
+  color: #F2CA46; 
+}
+
+/* BUTTONS */
+.btn {
+  padding: 10px 18px;
+  border: 1px solid #daa425;
+  background: transparent;
+  color: #daa425;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: bold;
+  transition: 0.3s;
+  border-radius: 4px;
+}
+
+.btn:hover {
+  background: #daa425;
+  color: #000;
+  border-color: #daa425;
+}
+
+.signup-btn {
+  background: #daa425;
+  color: #000;
+}
+
+.signup-btn:hover {
+  background: #fff;
+  border-color: #fff;
+}
+
+/* HERO SECTION */
+.hero-section {
+  width: 100vw;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 100px;
+  position: relative;
+}
+
+.hero-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55); /* adjust darkness */
+  z-index: 1;
+}
+
+.hero-content {
+  text-align: center;
+  color: white;
+  padding: 0 30px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-content h2 {
+  font-size: 30px;
+  letter-spacing: 2px;
+}
+
+.hero-content h1 {
+  font-size: 65px;
+  margin: 10px 0;
+  letter-spacing: 5px;
+  color: #daa425;
+}
+
+.hero-content p {
+  font-size: 16px;
+  margin-bottom: 30px;
+}
+
+.hero-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* FOOTER */
+.footer {
+  background: #2d2a30;
+  color: white;
+  padding: 50px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  z-index: 2;
+  position: relative;
+  width: 100vw !important;
+  margin-left: 0 !important;
+}
+
+.footer-left,
+.footer-center,
+.footer-right {
+  flex: 1;
+  min-width: 250px;
+}
+
+.footer-logo {
+  height: 200px;
+  margin-top: 10px;
+}
+
+.footer-company-name {
+  margin-top: 15px;
+  color: #bbb;
+  font-size: 14px;
+}
+
+.footer-center i {
+  margin-right: 15px;
+  background: #333;
+  border-radius: 50%;
+  padding: 10px;
+}
+
+.footer-icons a {
+  background: #333;
+  padding: 8px 12px;
+  margin-right: 5px;
+  color: white;
+  font-size: 18px;
+  border-radius: 4px;
+}
+
+.footer-icons a:hover {
+  background: #daa425;
+  color: #000;
+}
+
+@media (max-width: 900px) {
+  .footer-left,
+  .footer-center,
+  .footer-right {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+}
+
+/* Centered white box for login/signup */
+.auth-page {
+  min-height: 100vh;
+  width: 100vw;
+  background: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+.auth-box {
+  width: 100%; /* take full width of container */
+  max-width: 380px;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.auth-box h2 {
+  margin-bottom: 25px;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 15px;
+  background: white; /* ensures white background */
+  color: #333;
+}
+
+.auth-btn {
+  width: 100%;
+  margin-top: 15px;
+  padding: 10px 18px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: bold;
+  text-transform: uppercase;
+  border: 1px solid #daa425;
+  background: #daa425;
+  color: #000;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.auth-btn:hover {
+  background: transparent;
+  color: #daa425;
+  border-color: #daa425;
+}
+
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 110px;
+  width: 240px;
+  height: calc(100vh - 90px);
+  background: #2d2a30;
+  color: white;
+  padding-top: 20px;
+  overflow-y: auto;
+  border-right: 2px solid #000;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0 0 40px 0;
+}
+
+.sidebar-menu li {
+  margin: 5px 0;
+}
+
+.sidebar-menu a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  transition: 0.3s ease;
+}
+
+.sidebar-menu a i {
+  width: 22px;
+  font-size: 18px;
+}
+
+.sidebar-menu a:hover {
+  background: #daa425;
+  color: #000;
+}
+
+/* MAIN DASHBOARD PANEL */
+.dashboard-main {
+  display: flex;
+  width: 100%;
+  padding-top: 100px;
+  min-height: 100vh;
+}
+
+.dashboard-content {
+  margin-left: 100px;
+  overflow-x: auto;
+  /* width: 100%; */
+  padding: 35px;
+  background: #f5f5f5;
+  min-height: calc(100vh - 120px);
+}
