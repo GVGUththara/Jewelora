@@ -25,11 +25,13 @@ Jewelora is a scalable e-commerce platform built using a microservices architect
 
 * Delivery personnel module with secure order access and real-time delivery tracking.
   
-### Security
+## Security
 
-* JWT-based authentication and role-based access control.
+* **Auth Service →** Authenticates users, validates passwords, and issues JWT tokens.
+* **API Gateway →** Verifies incoming JWTs and forwards only valid authenticated requests to downstream services.
+* **Resource Microservices →** Each service independently validates JWTs and enforces role-based access control using Spring Security and @PreAuthorize.
 
-### Microservices & Communication
+## Microservices & Communication
 
 * RESTful APIs for all CRUD operations.
 * Inter-service communication using Spring Cloud Feign clients.
