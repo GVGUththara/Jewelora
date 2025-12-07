@@ -18,8 +18,8 @@ import {
 const STATUS_COLORS = {
   PENDING: "#fbc02d",
   PROCESSED: "#1976d2",
-  DISPATCHED: "#0288d1",
-  DELIVERED: "#2e7d32",
+  DISPATCHED: "#517891",
+  DELIVERED: "#2d7a2d",
   CANCELLED: "#d32f2f",
 };
 
@@ -48,6 +48,7 @@ const MyOrders = () => {
   const PRODUCT_BASE_URL = import.meta.env.VITE_PRODUCT_API;
   const ORDER_URL = import.meta.env.VITE_ORDER_URL;
   const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_API;
+  const DELIVERY_BASE_API = import.meta.env.VITE_DELIVERY_API;
 
   const customerId = localStorage.getItem("userId");
 
@@ -57,10 +58,29 @@ const MyOrders = () => {
         const res = await axiosInstance.get(
           `${ORDER_URL}/get-order-customer/${customerId}`
         );
+
         const ordersData = res.data;
 
         const ordersWithImages = await Promise.all(
           ordersData.map(async (order) => {
+            // Fetch Delivery Person for THIS order
+            let deliveryPersonName = "";
+            let deliveryPersonContact = "";
+
+            if (order.deliveryPersonId) {
+              try {
+                const dpRes = await axiosInstance.get(
+                  `${DELIVERY_BASE_API}/get-delivery-person/${order.deliveryPersonId}`
+                );
+                const dp = dpRes.data;
+                deliveryPersonName = `${dp.firstName} ${dp.lastName}`;
+                deliveryPersonContact = dp.contactNo;
+              } catch (err) {
+                console.error("Failed fetching delivery person", err);
+              }
+            }
+
+            // Fetch product images
             const itemsWithImages = await Promise.all(
               order.orderItems.map(async (item) => {
                 try {
@@ -75,7 +95,13 @@ const MyOrders = () => {
                 }
               })
             );
-            return { ...order, orderItems: itemsWithImages };
+
+            return {
+              ...order,
+              deliveryPersonName,
+              deliveryPersonContact,
+              orderItems: itemsWithImages,
+            };
           })
         );
 
@@ -118,13 +144,25 @@ const MyOrders = () => {
                   <strong>Total Amount</strong>
                 </TableCell>
                 <TableCell>
-                  <strong>Status</strong>
+                  <strong>Order Date</strong>
                 </TableCell>
                 <TableCell>
-                  <strong>Address</strong>
+                  <strong>Order Status</strong>
                 </TableCell>
                 <TableCell>
-                  <strong>Actions</strong>
+                  <strong>Shipping Address</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Delivery Person</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Delivery Contact</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Delivered Date</strong>
+                </TableCell>
+                <TableCell>
+                  <strong></strong>
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -136,12 +174,29 @@ const MyOrders = () => {
                     <TableCell>{order.id}</TableCell>
                     <TableCell>Rs. {order.totalAmount.toFixed(2)}</TableCell>
                     <TableCell>
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
                       <StatusChip status={order.orderStatus} />
                     </TableCell>
                     <TableCell>
                       {order.streetNumber}, {order.streetName1},{" "}
                       {order.streetName2 && order.streetName2 + ", "}
                       {order.city}, {order.postalCode}
+                    </TableCell>
+                    {order.deliveryPersonId ? (
+                      <>
+                        <TableCell>{order.deliveryPersonName}</TableCell>
+                        <TableCell>{order.deliveryPersonContact}</TableCell>
+                      </>
+                    ) : (
+                      <em>Not Assigned</em>
+                    )}
+
+                    <TableCell>
+                      {order.orderStatus === "DELIVERED" && order.deliveredDate
+                        ? new Date(order.deliveredDate).toLocaleDateString()
+                        : "-"}
                     </TableCell>
 
                     <TableCell>

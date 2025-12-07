@@ -48,7 +48,7 @@ export default function Sidebar() {
         </li>
 
         <li>
-          <Link to="/dashboard/delivery-people">
+          <Link to="/dashboard/deliveryPeople">
             <i className="fa-solid fa-motorcycle"></i>
             Delivery People
           </Link>

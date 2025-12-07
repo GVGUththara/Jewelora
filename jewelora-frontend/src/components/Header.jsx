@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 export default function Header() {
   const role = localStorage.getItem("role");
   const isCustomer = role === "CUSTOMER";
+  const isDeliveryPerson = role === "DELIVERY_PERSON";
   const navigate = useNavigate();
 
   const [cartCount, setCartCount] = useState(0);
@@ -76,18 +77,18 @@ export default function Header() {
         </div>
 
         <nav className="navbar-menu">
-          <a href="/">Home</a>
           {isCustomer && (
             <>
+              {/* <a href="/">Home</a> */}
               <a href="/browseProducts" className="nav-icon">
                 Products
               </a>
-            </>
-          )}
-          <a href="/about">About Us</a>
-          <a href="/contact">Contact Us</a>
-          {isCustomer && (
-            <>
+              <a href="/about" className="nav-icon">
+                About Us
+              </a>
+              <a href="/contact" className="nav-icon">
+                Contact Us
+              </a>
               <a
                 href="/cart"
                 className="nav-icon"
@@ -157,6 +158,67 @@ export default function Header() {
                     >
                       My Orders
                     </a>
+                    <div
+                      onClick={handleLogout}
+                      style={{
+                        display: "block",
+                        padding: "8px 16px",
+                        cursor: "pointer",
+                        color: "#333",
+                        borderTop: "1px solid #eee",
+                      }}
+                    >
+                      Logout
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
+          {isDeliveryPerson && (
+            <>
+              <a href="/delivery/assignedOrders" className="nav-icon">
+                Assigned Orders
+              </a>
+              <a href="/delivery/completedOrders" className="nav-icon">
+                Completed Orders
+              </a>
+
+              <div
+                className="nav-icon"
+                style={{ position: "relative", cursor: "pointer" }}
+                ref={dropdownRef}
+                onClick={() => setProfileOpen((prev) => !prev)}
+              >
+                <FaUser size={20} />
+
+                {profileOpen && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "30px",
+                      right: 0,
+                      background: "white",
+                      boxShadow: "0px 2px 8px rgba(0,0,0,0.15)",
+                      borderRadius: "6px",
+                      overflow: "hidden",
+                      zIndex: 1000,
+                    }}
+                  >
+                    <a
+                      href="/profile"
+                      style={{
+                        display: "block",
+                        padding: "8px 16px",
+                        textDecoration: "none",
+                        color: "#333",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      My Profile
+                    </a>
+
                     <div
                       onClick={handleLogout}
                       style={{

@@ -9,12 +9,17 @@ import {
   Button,
   Typography,
   Alert,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
+
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 export default function Login() {
   const navigate = useNavigate();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
   const AUTH_BASE_URL = import.meta.env.VITE_AUTH_URL;
@@ -46,7 +51,8 @@ export default function Login() {
       window.dispatchEvent(new Event("cartUpdated"));
 
       if (data.role === "CUSTOMER") navigate("/browseProducts");
-      else if (data.role === "ADMIN") navigate("/dashboard/");
+      else if (data.role === "ADMIN" || data.role === "INVENTORY_MANAGER") navigate("/dashboard/");
+      else if (data.role === "DELIVERY_PERSON") navigate("/delivery/assignedOrders");
     } catch (err) {
       console.log(err);
       setErrorMsg(
@@ -100,11 +106,31 @@ export default function Login() {
         <TextField
           fullWidth
           label="Password"
-          type="password"
+          type={showPassword ? "text" : "password"}
           variant="outlined"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           sx={{ mb: 3 }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  onClick={() => setShowPassword(!showPassword)}
+                  edge="end"
+                  sx={{
+                    "&:focus": {
+                      outline: "none",
+                    },
+                    "&:focus-visible": {
+                      outline: "none",
+                    },
+                  }}
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
 
         <Button
@@ -120,6 +146,18 @@ export default function Login() {
         >
           Login
         </Button>
+
+        <Typography
+          variant="body2"
+          sx={{ mt: 2, textAlign: "center", cursor: "pointer" }}
+          onClick={() => navigate("/signup")}
+        >
+          Don't have an account?{" "}
+          <span style={{ color: "#DAA425", fontWeight: "bold" }}>
+            Sign Up
+          </span>
+        </Typography>
+        
       </Paper>
     </Box>
   );

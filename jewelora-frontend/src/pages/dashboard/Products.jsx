@@ -30,7 +30,9 @@ export default function Products() {
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const res = await axiosInstance.get(`${CATEGORY_BASE_URL}/get-all-category`);
+        const res = await axiosInstance.get(
+          `${CATEGORY_BASE_URL}/get-all-category`
+        );
 
         const catMap = {};
         res.data.forEach((cat) => {
@@ -44,7 +46,9 @@ export default function Products() {
 
     const loadProducts = async () => {
       try {
-        const res = await axiosInstance.get(`${PRODUCT_BASE_URL}/get-all-product`);
+        const res = await axiosInstance.get(
+          `${PRODUCT_BASE_URL}/get-all-product`
+        );
         console.log("API Response:", res.data);
         setProducts(res.data);
       } catch (err) {
@@ -78,7 +82,9 @@ export default function Products() {
     if (!result.isConfirmed) return;
 
     try {
-      await axiosInstance.delete(`${PRODUCT_BASE_URL}/delete-product/${productId}`);
+      await axiosInstance.delete(
+        `${PRODUCT_BASE_URL}/delete-product/${productId}`
+      );
 
       setProducts(products.filter((p) => p.productId !== productId));
 
@@ -116,6 +122,10 @@ export default function Products() {
           startIcon={<FaPlus />}
           sx={{
             backgroundColor: "#DAA425",
+            fontWeight: "bold",
+            px: 4,
+            borderRadius: 2,
+            fontSize: "1rem",
             "&:hover": { backgroundColor: "#b88a1e" },
           }}
           onClick={handleAddProduct}
@@ -124,10 +134,7 @@ export default function Products() {
         </Button>
       </Box>
 
-      <TableContainer
-        component={Paper}
-        sx={{ overflowX: "auto" }}
-      >
+      <TableContainer component={Paper} sx={{ overflowX: "auto" }}>
         <Table stickyHeader>
           <TableHead sx={{ background: "#DAA425" }}>
             <TableRow>
@@ -213,12 +220,28 @@ export default function Products() {
                 <TableCell>
                   <IconButton
                     color="primary"
+                    sx={{
+                      "&:focus": {
+                        outline: "none",
+                      },
+                      "&:focus-visible": {
+                        outline: "none",
+                      },
+                    }}
                     onClick={() => handleEdit(p.productId)}
                   >
                     <FaEdit />
                   </IconButton>
                   <IconButton
                     color="error"
+                    sx={{
+                      "&:focus": {
+                        outline: "none",
+                      },
+                      "&:focus-visible": {
+                        outline: "none",
+                      },
+                    }}
                     onClick={() => handleDelete(p.productId)}
                   >
                     <FaTrash />

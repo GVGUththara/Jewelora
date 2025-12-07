@@ -22,8 +22,8 @@ import Swal from "sweetalert2";
 const STATUS_COLORS = {
   PENDING: "#fbc02d",
   PROCESSED: "#1976d2",
-  DISPATCHED: "#0288d1",
-  DELIVERED: "#2e7d32",
+  DISPATCHED: "#517891",
+  DELIVERED: "#2d7a2d",
   CANCELLED: "#d32f2f",
 };
 
@@ -50,61 +50,100 @@ const OrderDetails = () => {
   const ORDER_BASE_URL = import.meta.env.VITE_ORDER_URL;
   const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_API;
   const PRODUCT_BASE_URL = import.meta.env.VITE_PRODUCT_API;
-  const CUSTOMER_URL = import.meta.env.VITE_CUSTOMER_URL;
+  const CUSTOMER_BASE_URL = import.meta.env.VITE_CUSTOMER_URL;
+  const DELIVERY_BASE_API = import.meta.env.VITE_DELIVERY_API;
 
   const [order, setOrder] = useState(null);
   const [newStatus, setNewStatus] = useState("");
+  const [deliveryList, setDeliveryList] = useState([]);
+  const [selectedDeliveryPerson, setSelectedDeliveryPerson] = useState("");
 
   const role = localStorage.getItem("role");
 
-  useEffect(() => {
-    const loadOrder = async () => {
+  const loadOrder = async () => {
+    try {
+      // Fetch order
+      const res = await axiosInstance.get(
+        `${ORDER_BASE_URL}/get-order/${orderId}`
+      );
+      const orderData = res.data;
+
+      // Fetch customer details
+      let customerName = "Unknown";
       try {
-        // Fetch order
-        const res = await axiosInstance.get(
-          `${ORDER_BASE_URL}/get-order/${orderId}`
+        const customerRes = await axiosInstance.get(
+          `${CUSTOMER_BASE_URL}/get/${orderData.customerId}`
         );
-        const orderData = res.data;
-
-        // Fetch customer details
-        let customerName = "Unknown";
-        try {
-          const customerRes = await axiosInstance.get(
-            `${CUSTOMER_URL}/get/${orderData.customerId}`
-          );
-          const customer = customerRes.data;
-          customerName = `${customer.firstName} ${customer.lastName}`;
-        } catch (err) {
-          console.error("Failed fetching customer", err);
-        }
-
-        // Fetch product details for each order item
-        const orderItemsWithImages = await Promise.all(
-          orderData.orderItems.map(async (item) => {
-            try {
-              const productRes = await axiosInstance.get(
-                `${PRODUCT_BASE_URL}/get-product/${item.productId}`
-              );
-              const product = productRes.data;
-              return { ...item, imageUrl: product.imageUrl || "" };
-            } catch (err) {
-              console.error("Failed fetching product", err);
-              return { ...item, imageUrl: "" };
-            }
-          })
-        );
-
-        setOrder({
-          ...orderData,
-          customerName,
-          orderItems: orderItemsWithImages,
-        });
+        const customer = customerRes.data;
+        customerName = `${customer.firstName} ${customer.lastName}`;
       } catch (err) {
-        console.error("Failed to load order", err);
+        console.error("Failed fetching customer", err);
       }
+
+      // Fetch delivery person details
+      let deliveryPersonName = "";
+      let deliveryPersonContact = "";
+      if (orderData.deliveryPersonId) {
+        try {
+          const dpRes = await axiosInstance.get(
+            `${DELIVERY_BASE_API}/get-delivery-person/${orderData.deliveryPersonId}`
+          );
+          const dp = dpRes.data;
+          deliveryPersonName = `${dp.firstName} ${dp.lastName}`;
+          deliveryPersonContact = dp.contactNo;
+        } catch (err) {
+          console.error("Failed fetching delivery person", err);
+        }
+      }
+
+      // Fetch product details for each order item
+      const orderItemsWithImages = await Promise.all(
+        orderData.orderItems.map(async (item) => {
+          try {
+            const productRes = await axiosInstance.get(
+              `${PRODUCT_BASE_URL}/get-product/${item.productId}`
+            );
+            const product = productRes.data;
+            return { ...item, imageUrl: product.imageUrl || "" };
+          } catch (err) {
+            console.error("Failed fetching product", err);
+            return { ...item, imageUrl: "" };
+          }
+        })
+      );
+
+      setOrder({
+        ...orderData,
+        customerName,
+        deliveryPersonName,
+        deliveryPersonContact,
+        orderItems: orderItemsWithImages,
+      });
+    } catch (err) {
+      console.error("Failed to load order", err);
+    }
+  };
+
+  const isLockedOrder = ["DISPATCHED", "DELIVERED"].includes(order?.orderStatus);
+
+  const loadDeliveryPeople = async () => {
+    try {
+      const res = await axiosInstance.get(
+        `${DELIVERY_BASE_API}/get-all-delivery-people`
+      );
+      setDeliveryList(res.data);
+    } catch (err) {
+      console.error("Failed fetching delivery people", err);
+    }
+  };
+
+  useEffect(() => {
+    const run = async () => {
+      await loadOrder();
+      await loadDeliveryPeople();
     };
 
-    loadOrder();
+    run();
   }, [orderId]);
 
   if (!order) {
@@ -122,6 +161,7 @@ const OrderDetails = () => {
         case "PENDING":
           return ["PROCESSED"];
         case "PROCESSED":
+          if (!order.deliveryPersonId) return [];
           return ["DISPATCHED"];
         default:
           return [];
@@ -132,17 +172,39 @@ const OrderDetails = () => {
     return [];
   };
 
-  const handleUpdateStatus = async () => {
-    if (!newStatus) {
-      Swal.fire({
-        icon: "warning",
-        confirmButtonColor: "#DAA425",
-        title: "Select Status",
-        text: "Please select a status before updating.",
-      });
-      return;
-    }
+  const handleAssignDeliveryPerson = async () => {
+    if (!selectedDeliveryPerson) return;
 
+    try {
+      await axiosInstance.put(
+        `${ORDER_BASE_URL}/assign-delivery-person/${order.id}`,
+        { deliveryPersonId: selectedDeliveryPerson }
+      );
+
+      await loadOrder();
+
+      setSelectedDeliveryPerson("");
+
+      Swal.fire({
+        icon: "success",
+        title: "Assigned!",
+        text: "Delivery person successfully assigned.",
+        timer: 1200,
+        showConfirmButton: false,
+      });
+    } catch (err) {
+      console.error(err);
+      Swal.fire({
+        icon: "error",
+        title: "Assignment Failed",
+        text:
+          err.response?.data?.message ||
+          "Unable to assign delivery person. Try again.",
+      });
+    }
+  };
+
+  const handleUpdateStatus = async () => {
     try {
       const res = await axiosInstance.put(
         `${ORDER_BASE_URL}/update-order-status/${order.id}/status`,
@@ -236,8 +298,36 @@ const OrderDetails = () => {
                 <TableCell>
                   <strong>Order Date</strong>
                 </TableCell>
-                <TableCell>{order.createdAt}</TableCell>
+                <TableCell>
+                  {new Date(order.createdAt).toLocaleDateString()}
+                </TableCell>
               </TableRow>
+              {order.deliveryPersonId && (
+                <>
+                  <TableRow>
+                    <TableCell>
+                      <strong>Delivery Person Name</strong>
+                    </TableCell>
+                    <TableCell>{order.deliveryPersonName}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>
+                      <strong>Delivery Person Contact Number</strong>
+                    </TableCell>
+                    <TableCell>{order.deliveryPersonContact}</TableCell>
+                  </TableRow>
+                </>
+              )}
+              {order.orderStatus === "DELIVERED" && order.deliveredDate && (
+                <TableRow>
+                  <TableCell>
+                    <strong>Delivered Date</strong>
+                  </TableCell>
+                  <TableCell>
+                    {new Date(order.deliveredDate).toLocaleDateString()}
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
 
@@ -294,40 +384,87 @@ const OrderDetails = () => {
             </TableBody>
           </Table>
 
+          {/* ============ ASSIGN DELIVERY PERSON SECTION ============ */}
+          {(role === "ADMIN" || role === "INVENTORY_MANAGER") &&
+            !isLockedOrder && (
+              <>
+                <Divider sx={{ my: 3 }} />
+                <Typography variant="h6" fontWeight="bold">
+                  Assign Delivery Person
+                </Typography>
+
+                <Box sx={{ mt: 2, display: "flex", gap: 2 }}>
+                  <Select
+                    value={selectedDeliveryPerson}
+                    onChange={(e) => setSelectedDeliveryPerson(e.target.value)}
+                    displayEmpty
+                    sx={{ width: 300 }}
+                  >
+                    <MenuItem value="">Select Delivery Person</MenuItem>
+                    {deliveryList.map((dp) => (
+                      <MenuItem
+                        key={dp.deliveryPersonId}
+                        value={dp.deliveryPersonId}
+                      >
+                        {dp.firstName} {dp.lastName} — {dp.contactNo}
+                      </MenuItem>
+                    ))}
+                  </Select>
+
+                  <Button
+                    variant="contained"
+                    sx={{
+                      fontWeight: "bold",
+                      backgroundColor: "#DAA425",
+                      "&:hover": { backgroundColor: "#b88a1e" },
+                    }}
+                    onClick={handleAssignDeliveryPerson}
+                    disabled={!selectedDeliveryPerson}
+                  >
+                    Assign Delivery Person
+                  </Button>
+                </Box>
+              </>
+            )}
+
           {/* ============ UPDATE STATUS SECTION ============ */}
-          <Divider sx={{ my: 3 }} />
-          <Typography variant="h6" fontWeight="bold">
-            Update Order Status
-          </Typography>
+          {!isLockedOrder && (
+            <>
+              <Divider sx={{ my: 3 }} />
+              <Typography variant="h6" fontWeight="bold">
+                Update Order Status
+              </Typography>
 
-          <Box sx={{ mt: 2, display: "flex", gap: 2 }}>
-            <Select
-              value={newStatus}
-              onChange={(e) => setNewStatus(e.target.value)}
-              displayEmpty
-              sx={{ width: 250 }}
-            >
-              <MenuItem value="">Select Status</MenuItem>
-              {getAllowedStatuses().map((status) => (
-                <MenuItem key={status} value={status}>
-                  {status}
-                </MenuItem>
-              ))}
-            </Select>
+              <Box sx={{ mt: 2, display: "flex", gap: 2 }}>
+                <Select
+                  value={newStatus}
+                  onChange={(e) => setNewStatus(e.target.value)}
+                  displayEmpty
+                  sx={{ width: 250 }}
+                >
+                  <MenuItem value="">Select Status</MenuItem>
+                  {getAllowedStatuses().map((status) => (
+                    <MenuItem key={status} value={status}>
+                      {status}
+                    </MenuItem>
+                  ))}
+                </Select>
 
-            <Button
-              variant="contained"
-              sx={{
-                fontWeight: "bold",
-                backgroundColor: "#DAA425",
-                "&:hover": { backgroundColor: "#b88a1e" },
-              }}
-              onClick={handleUpdateStatus}
-              disabled={getAllowedStatuses().length === 0}
-            >
-              Update Order Status
-            </Button>
-          </Box>
+                <Button
+                  variant="contained"
+                  sx={{
+                    fontWeight: "bold",
+                    backgroundColor: "#DAA425",
+                    "&:hover": { backgroundColor: "#b88a1e" },
+                  }}
+                  onClick={handleUpdateStatus}
+                  disabled={!newStatus || getAllowedStatuses().length === 0}
+                >
+                  Update Order Status
+                </Button>
+              </Box>
+            </>
+          )}
         </Paper>
       </Box>
     </div>
