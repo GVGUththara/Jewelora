@@ -51,6 +51,12 @@ public class Order {
 
     @Column(name = "postal_code", nullable = false, length = 20)
     private String postalCode;
+    
+    @Column(name = "delivery_person_id", length = 36)
+    private String deliveryPersonId;
+    
+    @Column(name = "delivered_date")
+    private LocalDateTime deliveredDate;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

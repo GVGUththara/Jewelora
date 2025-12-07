@@ -48,7 +48,7 @@ public class ProductController {
     }
 
     @GetMapping("/get-product/{productId}")
-    @PreAuthorize("hasRole('INVENTORY_MANAGER') or hasRole('ADMIN') or hasRole('CUSTOMER')")
+    @PreAuthorize("hasRole('INVENTORY_MANAGER') or hasRole('ADMIN') or hasRole('CUSTOMER') or hasRole('DELIVERY_PERSON')")
     public ResponseEntity<Product> getProductById(@PathVariable("productId") String productId) {
         return ResponseEntity.ok(productService.getProductById(productId));
     }

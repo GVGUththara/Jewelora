@@ -1,9 +1,9 @@
 package com.jewelora.marketplace.orderservice.service;
 
+import com.jewelora.marketplace.orderservice.dto.AssignDeliveryPersonRequest;
 import com.jewelora.marketplace.orderservice.dto.CustomerAddressUpdateRequest;
 import com.jewelora.marketplace.orderservice.dto.OrderCreateRequest;
 import com.jewelora.marketplace.orderservice.dto.UpdateOrderStatusRequest;
-import com.jewelora.marketplace.orderservice.dto.OrderItemRequest;
 import com.jewelora.marketplace.orderservice.dto.ProductStockUpdateRequest;
 import com.jewelora.marketplace.orderservice.entity.Order;
 import com.jewelora.marketplace.orderservice.entity.OrderItem;
@@ -155,7 +155,15 @@ public class OrderService {
         
         return orders;
     }
+    
+    public List<Order> getOrdersByDeliveryPerson(String deliveryPersonId) {
+        List<Order> orders = orderRepository.findByDeliveryPersonId(deliveryPersonId);
 
+        orders.forEach(o -> o.getOrderItems().size());
+
+        return orders;
+    }
+    
     // Delete → Cancel
     public String cancelOrder(String orderId) {
         Order order = orderRepository.findById(orderId)
@@ -188,8 +196,18 @@ public class OrderService {
                 "Invalid status update: " + current + " → " + next
             );
         }
+        
+        if (next == OrderStatus.DISPATCHED && order.getDeliveryPersonId() == null) {
+            throw new RuntimeException("Assign a delivery person before dispatching the order");
+        }
 
         order.setOrderStatus(next);
+        order.setUpdatedAt(LocalDateTime.now());
+        
+        if (next == OrderStatus.DELIVERED) {
+            order.setDeliveredDate(LocalDateTime.now());
+        }
+        
         return orderRepository.save(order);
     }
 
@@ -201,4 +219,42 @@ public class OrderService {
             case DELIVERED, CANCELLED -> false; 
         };
     }
+
+    // Assign Delivery Person
+    @Transactional
+    public Order assignDeliveryPerson(String orderId, AssignDeliveryPersonRequest request) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        if (order.getOrderStatus() == OrderStatus.DISPATCHED ||
+        	order.getOrderStatus() == OrderStatus.CANCELLED ||
+            order.getOrderStatus() == OrderStatus.DELIVERED) {
+            throw new RuntimeException("Cannot assign delivery person for dispatched/completed/cancelled orders");
+        }
+
+        order.setDeliveryPersonId(request.getDeliveryPersonId());
+        order.setUpdatedAt(LocalDateTime.now());
+
+        return orderRepository.save(order);
+    }
+
+    public List<Order> getAssignedOrders(String deliveryPersonId) {
+        List<Order> orders = orderRepository
+            .findByDeliveryPersonIdAndOrderStatusNot(deliveryPersonId, OrderStatus.DELIVERED);
+
+        orders.forEach(o -> o.getOrderItems().size());
+
+        return orders;
+    }
+
+    public List<Order> getDeliveredOrders(String deliveryPersonId) {
+        List<Order> orders = orderRepository
+            .findByDeliveryPersonIdAndOrderStatus(deliveryPersonId, OrderStatus.DELIVERED);
+
+        orders.forEach(o -> o.getOrderItems().size());
+
+        return orders;
+    }
+
 }
