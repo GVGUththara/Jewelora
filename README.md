@@ -6,14 +6,16 @@ Jewelora is a scalable e-commerce platform built using a microservices architect
 
 ## Features
 
-### Customer Module
+### Customer
 
 * Browse available products.
-* Manage shopping cart: add/remove products and update product quantities.
-* Place orders for the selected items in your cart.
-* Access detailed information about the current and past orders.
+* Manage shopping cart
+  * Add/remove products
+  * Update product quantities
+* Place orders for the selected items in the cart.
+* View detailed information on current and previous orders.
 
-### Inventory Manager Module
+### Inventory Manager
 
 * Manage products and product categories (add/update/delete).
 * Update product inventory and manage stock levels.
@@ -21,9 +23,20 @@ Jewelora is a scalable e-commerce platform built using a microservices architect
 * Update order statuses in real time.
 * Assign delivery personnel to orders for timely deliveries.
 
-### Future Extensions
+### Admin
 
-* Delivery personnel module with secure order access and real-time delivery tracking.
+The Admin has full system access and can:
+* Perform everything the Inventory Manager can do.
+* Create and manage Inventory Managers.
+* Create and manage Delivery Personnel.
+* View dashboard analytics (to be developed).
+* Generate reports (to be developed).
+  
+### Delivery Person
+
+* View all assigned orders.
+* Update order status during delivery workflow.
+* Access list of previously delivered orders.
   
 ## Security
 
@@ -43,6 +56,10 @@ Jewelora is a scalable e-commerce platform built using a microservices architect
 * **Frontend:** React, Vite
 * **Backend:** Spring Boot, Microservices Architecture
 * **Database:** MySQL
-* **Microservices Tools:** Spring Cloud Gateway, Eureka Server
+* **Cloud/Microservices Tools:** Spring Cloud Gateway, Eureka Server, Feign Clients
 * **Authentication:** JWT
 
+## Future Extensions
+
+* Real-time delivery tracking.
+* Notification microservice for email/SMS updates.
