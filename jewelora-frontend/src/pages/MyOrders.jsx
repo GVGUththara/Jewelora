@@ -206,6 +206,12 @@ const MyOrders = () => {
                           setOpenOrder(openOrder === order.id ? null : order.id)
                         }
                         sx={{
+                          "&:focus": {
+                            outline: "none",
+                          },
+                          "&:focus-visible": {
+                            outline: "none",
+                          },
                           borderColor: "#DAA425",
                           color: "#DAA425",
                           fontWeight: "bold",

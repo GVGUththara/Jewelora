@@ -158,7 +158,15 @@ const AssignedOrders = () => {
                         onClick={() =>
                           navigate(`/delivery/getOrderInfo/${order.id}`)
                         }
-                        sx={{ color: "#DAA425" }}
+                        sx={{
+                          "&:focus": {
+                            outline: "none",
+                          },
+                          "&:focus-visible": {
+                            outline: "none",
+                          },
+                          color: "#DAA425",
+                        }}
                       >
                         <VisibilityIcon />
                       </IconButton>

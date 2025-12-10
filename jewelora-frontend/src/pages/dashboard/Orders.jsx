@@ -25,8 +25,8 @@ const Orders = () => {
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
 
-  const ORDER_URL = import.meta.env.VITE_ORDER_URL;
-  const CUSTOMER_URL = import.meta.env.VITE_CUSTOMER_URL;
+  const ORDER_BASE_URL = import.meta.env.VITE_ORDER_URL;
+  const CUSTOMER_BASE_URL = import.meta.env.VITE_CUSTOMER_URL;
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -63,7 +63,7 @@ const Orders = () => {
   useEffect(() => {
     const loadOrders = async () => {
       try {
-        const res = await axiosInstance.get(`${ORDER_URL}/get-all-order`);
+        const res = await axiosInstance.get(`${ORDER_BASE_URL}/get-all-order`);
         const orderList = res.data;
 
         // Fetch customer names for each order
@@ -71,7 +71,7 @@ const Orders = () => {
           orderList.map(async (order) => {
             try {
               const customerRes = await axiosInstance.get(
-                `${CUSTOMER_URL}/get/${order.customerId}`
+                `${CUSTOMER_BASE_URL}/get/${order.customerId}`
               );
               const customer = customerRes.data;
 
@@ -311,7 +311,15 @@ const Orders = () => {
                             onClick={() =>
                               navigate(`/dashboard/getOrderDetails/${order.id}`)
                             }
-                            sx={{ color: "#DAA425" }}
+                            sx={{
+                              "&:focus": {
+                                outline: "none",
+                              },
+                              "&:focus-visible": {
+                                outline: "none",
+                              },
+                              color: "#DAA425",
+                            }}
                           >
                             <VisibilityIcon />
                           </IconButton>

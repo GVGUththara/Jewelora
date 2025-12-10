@@ -209,7 +209,7 @@ export default function CheckoutPage() {
         </Table>
       </Paper>
 
-      <Typography variant="h5" sx={{ mb: 2 }}>
+      <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
         Shipping & Contact Information
       </Typography>
       <Box
@@ -217,10 +217,10 @@ export default function CheckoutPage() {
           display: "flex",
           flexDirection: "column",
           gap: 2,
-          maxWidth: 1200,
+          
         }}
       >
-        <Box sx={{ display: "flex", gap: 2 }}>
+        <Box sx={{ display: "flex", gap: 3, mb: 3 }}>
           <TextField
             label="Contact Number"
             name="customerContact"
@@ -237,7 +237,7 @@ export default function CheckoutPage() {
           />
         </Box>
 
-        <Box sx={{ display: "flex", gap: 2 }}>
+        <Box sx={{ display: "flex", gap: 3, mb: 3 }}>
           <TextField
             label="Street Name 1"
             name="streetName1"
@@ -253,7 +253,7 @@ export default function CheckoutPage() {
           />
         </Box>
 
-        <Box sx={{ display: "flex", gap: 2 }}>
+        <Box sx={{ display: "flex", gap: 3, mb: 3 }}>
           <TextField
             label="City"
             name="city"
@@ -279,7 +279,10 @@ export default function CheckoutPage() {
           color="success"
           sx={{
             fontWeight: "bold",
-            paddingX: 5,
+            px: 4,
+            py: 1.3,
+            borderRadius: 2,
+            fontSize: "1rem",
             backgroundColor: "#DAA425",
             "&:hover": { backgroundColor: "#b88a1e" },
           }}

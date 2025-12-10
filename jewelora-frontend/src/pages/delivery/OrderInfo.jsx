@@ -333,39 +333,43 @@ const OrderInfo = () => {
         </Table>
 
         {/* ============ UPDATE STATUS SECTION ============ */}
-        <Divider sx={{ my: 3 }} />
-        <Typography variant="h6" fontWeight="bold">
-          Update Order Status
-        </Typography>
+        {order.orderStatus !== "DELIVERED" && (
+          <>
+            <Divider sx={{ my: 3 }} />
+            <Typography variant="h6" fontWeight="bold">
+              Update Order Status
+            </Typography>
 
-        <Box sx={{ mt: 2, display: "flex", gap: 2 }}>
-          <Select
-            value={newStatus}
-            onChange={(e) => setNewStatus(e.target.value)}
-            displayEmpty
-            sx={{ width: 250 }}
-          >
-            <MenuItem value="">Select Status</MenuItem>
-            {getAllowedStatuses().map((status) => (
-              <MenuItem key={status} value={status}>
-                {status}
-              </MenuItem>
-            ))}
-          </Select>
+            <Box sx={{ mt: 2, display: "flex", gap: 2 }}>
+              <Select
+                value={newStatus}
+                onChange={(e) => setNewStatus(e.target.value)}
+                displayEmpty
+                sx={{ width: 250 }}
+              >
+                <MenuItem value="">Select Status</MenuItem>
+                {getAllowedStatuses().map((status) => (
+                  <MenuItem key={status} value={status}>
+                    {status}
+                  </MenuItem>
+                ))}
+              </Select>
 
-          <Button
-            variant="contained"
-            sx={{
-              fontWeight: "bold",
-              backgroundColor: "#DAA425",
-              "&:hover": { backgroundColor: "#b88a1e" },
-            }}
-            onClick={handleUpdateStatus}
-            disabled={!newStatus || getAllowedStatuses().length === 0}
-          >
-            Update Order Status
-          </Button>
-        </Box>
+              <Button
+                variant="contained"
+                sx={{
+                  fontWeight: "bold",
+                  backgroundColor: "#DAA425",
+                  "&:hover": { backgroundColor: "#b88a1e" },
+                }}
+                onClick={handleUpdateStatus}
+                disabled={!newStatus || getAllowedStatuses().length === 0}
+              >
+                Update Order Status
+              </Button>
+            </Box>
+          </>
+        )}
       </Paper>
     </Box>
   );

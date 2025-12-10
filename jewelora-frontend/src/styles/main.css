@@ -87,6 +87,7 @@ a {
   align-items: center;
   color: white;
   transition: 0.2s;
+  font-weight: bold;
 }
 
 .nav-icon:hover {

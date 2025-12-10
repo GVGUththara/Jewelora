@@ -162,15 +162,18 @@ export default function AddDeliveryPerson() {
       </Typography>
 
       <Paper
+        elevation={4}
         sx={{
+          padding: 4,
           width: 1200,
-          p: 4,
           borderRadius: 3,
-          boxShadow: 3,
-          backgroundColor: "#fff",
         }}
       >
-        <Box display="flex" flexDirection="column" gap={3}>
+        <Typography variant="h6" sx={{ mb: 3, fontWeight: "bold" }}>
+          Delivery Person Information
+        </Typography>
+
+        <Box sx={{ display: "flex", gap: 3, mb: 3 }}>
           {/* First Name */}
           <TextField
             name="firstName"
@@ -194,7 +197,8 @@ export default function AddDeliveryPerson() {
             error={Boolean(errors.lastName)}
             helperText={errors.lastName}
           />
-
+        </Box>
+        <Box sx={{ display: "flex", gap: 3, mb: 3 }}>
           {/* Email */}
           <TextField
             name="email"
@@ -218,7 +222,9 @@ export default function AddDeliveryPerson() {
             error={Boolean(errors.contactNo)}
             helperText={errors.contactNo}
           />
+        </Box>
 
+        <Box sx={{ display: "flex", gap: 3, mb: 3 }}>
           {/* Password */}
           <TextField
             name="password"
@@ -259,60 +265,60 @@ export default function AddDeliveryPerson() {
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton
-                    onClick={() =>
-                      setShowConfirmPassword(!showConfirmPassword)
-                    }
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     sx={{ "&:focus": { outline: "none" } }}
                   >
-                    {showConfirmPassword ? (
-                      <VisibilityOff />
-                    ) : (
-                      <Visibility />
-                    )}
+                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
               ),
             }}
           />
+        </Box>
 
-          {/* Buttons */}
-          <Box display="flex" justifyContent="flex-end" mt={2} gap={2}>
-            <Button
-              variant="outlined"
-              onClick={() => navigate("/dashboard/deliveryPeople")}
-              sx={{
+        {/* Buttons */}
+        <Box
+          sx={{
+            mt: 4,
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          <Button
+            variant="outlined"
+            onClick={() => navigate("/dashboard/deliveryPeople")}
+            sx={{
+              borderColor: "#DAA425",
+              color: "#DAA425",
+              fontWeight: "bold",
+              px: 4,
+              borderRadius: 2,
+              fontSize: "1rem",
+              "&:hover": {
+                color: "white",
                 borderColor: "#DAA425",
-                color: "#DAA425",
-                fontWeight: "bold",
-                px: 4,
-                borderRadius: 2,
-                fontSize: "1rem",
-                "&:hover": {
-                  color: "white",
-                  borderColor: "#DAA425",
-                  backgroundColor: "#DAA425",
-                },
-              }}
-            >
-              Cancel
-            </Button>
-
-            <Button
-              variant="contained"
-              onClick={handleSubmit}
-              disabled={!isFormValid()}
-              sx={{
                 backgroundColor: "#DAA425",
-                fontWeight: "bold",
-                px: 4,
-                borderRadius: 2,
-                fontSize: "1rem",
-                "&:hover": { backgroundColor: "#b88a1e" },
-              }}
-            >
-              Register Delivery Person
-            </Button>
-          </Box>
+              },
+            }}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            variant="contained"
+            onClick={handleSubmit}
+            disabled={!isFormValid()}
+            sx={{
+              backgroundColor: "#DAA425",
+              fontWeight: "bold",
+              px: 4,
+              borderRadius: 2,
+              fontSize: "1rem",
+              "&:hover": { backgroundColor: "#b88a1e" },
+            }}
+          >
+            Register Delivery Person
+          </Button>
         </Box>
       </Paper>
     </div>

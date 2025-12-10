@@ -157,7 +157,16 @@ export default function BrowseProducts() {
                 </Typography>
 
                 <IconButton
-                  sx={{ mb: 1, color: "#DAA425" }}
+                  sx={{
+                    "&:focus": {
+                      outline: "none",
+                    },
+                    "&:focus-visible": {
+                      outline: "none",
+                    },
+                    mb: 1,
+                    color: "#DAA425",
+                  }}
                   onClick={() => handleAddToCart(p)}
                 >
                   <FaShoppingCart size={20} />

@@ -100,7 +100,7 @@ const DeliveredOrders = () => {
           color: "#DAA425",
         }}
       >
-        Jewelora | Orders
+        Jewelora | Completed Orders
       </Typography>
 
       {orders.length === 0 ? (
@@ -156,14 +156,25 @@ const DeliveredOrders = () => {
                     <TableCell>
                       {new Date(order.createdAt).toLocaleDateString()}
                     </TableCell>
-                    <TableCell>{}{new Date(order.deliveredDate).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      {}
+                      {new Date(order.deliveredDate).toLocaleDateString()}
+                    </TableCell>
 
                     <TableCell>
                       <IconButton
                         onClick={() =>
                           navigate(`/delivery/getOrderInfo/${order.id}`)
                         }
-                        sx={{ color: "#DAA425" }}
+                        sx={{
+                          "&:focus": {
+                            outline: "none",
+                          },
+                          "&:focus-visible": {
+                            outline: "none",
+                          },
+                          color: "#DAA425",
+                        }}
                       >
                         <VisibilityIcon />
                       </IconButton>
