@@ -2,6 +2,7 @@ package com.jewelora.marketplace.orderservice.service;
 
 import com.jewelora.marketplace.orderservice.dto.AssignDeliveryPersonRequest;
 import com.jewelora.marketplace.orderservice.dto.CustomerAddressUpdateRequest;
+import com.jewelora.marketplace.orderservice.dto.NotificationRequest;
 import com.jewelora.marketplace.orderservice.dto.OrderCreateRequest;
 import com.jewelora.marketplace.orderservice.dto.UpdateOrderStatusRequest;
 import com.jewelora.marketplace.orderservice.dto.ProductStockUpdateRequest;
@@ -11,6 +12,7 @@ import com.jewelora.marketplace.orderservice.enums.OrderStatus;
 import com.jewelora.marketplace.orderservice.repository.OrderRepository;
 import com.jewelora.marketplace.orderservice.repository.OrderItemRepository;
 import com.jewelora.marketplace.orderservice.client.CustomerServiceClient;
+import com.jewelora.marketplace.orderservice.client.NotificationServiceClient;
 import com.jewelora.marketplace.orderservice.client.ProductServiceClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +22,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -28,7 +32,8 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final ProductServiceClient productServiceClient;
-    private final CustomerServiceClient customerServiceClient; 
+    private final CustomerServiceClient customerServiceClient;
+    private final NotificationServiceClient notificationServiceClient;
 
     @Transactional
     // Create Order
@@ -104,7 +109,7 @@ public class OrderService {
         // Save all order items
         orderItemRepository.saveAll(orderItems);
 
-     // Update customer address/contact in customer-service
+        // Update customer address/contact in customer-service
         try {
             CustomerAddressUpdateRequest customerUpdate = new CustomerAddressUpdateRequest();
             customerUpdate.setStreetNumber(request.getStreetNumber());
@@ -123,6 +128,19 @@ public class OrderService {
             System.err.println("Failed to update customer info: " + e.getMessage());
         }
         
+        try {
+        	notificationServiceClient.sendCustomerOrderPlaced(
+        		    NotificationRequest.builder()
+        		        .phone(savedOrder.getCustomerContact())
+        		        .orderId(savedOrder.getId())
+        		        .totalAmount(savedOrder.getTotalAmount())
+        		        .build()
+        	);
+
+        } catch (Exception e) {
+            log.warn("SMS failed (ORDER_PLACED) for order {}", savedOrder.getId());
+        }
+
         return savedOrder;
     }
 
@@ -156,6 +174,7 @@ public class OrderService {
         return orders;
     }
     
+    //Get Orders By Delivery Person
     public List<Order> getOrdersByDeliveryPerson(String deliveryPersonId) {
         List<Order> orders = orderRepository.findByDeliveryPersonId(deliveryPersonId);
 
@@ -199,7 +218,7 @@ public class OrderService {
         
         if (next == OrderStatus.DISPATCHED && order.getDeliveryPersonId() == null) {
             throw new RuntimeException("Assign a delivery person before dispatching the order");
-        }
+        }    
 
         order.setOrderStatus(next);
         order.setUpdatedAt(LocalDateTime.now());
@@ -207,8 +226,49 @@ public class OrderService {
         if (next == OrderStatus.DELIVERED) {
             order.setDeliveredDate(LocalDateTime.now());
         }
-        
-        return orderRepository.save(order);
+
+        Order savedOrder = orderRepository.save(order);
+
+        if (next == OrderStatus.PROCESSED) {
+            try {
+            	notificationServiceClient.sendCustomerOrderProcessed(
+            		    NotificationRequest.builder()
+            		        .phone(savedOrder.getCustomerContact())
+            		        .orderId(savedOrder.getId())
+            		        .build()
+            	);
+            } catch (Exception e) {
+                log.warn("SMS failed (ORDER_PROCESSED) for order {}", savedOrder.getId());
+            }
+        }
+
+        if (next == OrderStatus.DISPATCHED) {
+            try {
+            	notificationServiceClient.sendCustomerOrderDispatched(
+            		    NotificationRequest.builder()
+            		        .phone(savedOrder.getCustomerContact())
+            		        .orderId(savedOrder.getId())
+            		        .build()
+            	);
+            } catch (Exception e) {
+                log.warn("SMS failed (ORDER_DISPATCHED) for order {}", savedOrder.getId());
+            }
+        }
+
+        if (next == OrderStatus.DELIVERED) {
+            try {
+            	notificationServiceClient.sendCustomerOrderDelivered(
+            		    NotificationRequest.builder()
+            		        .phone(savedOrder.getCustomerContact())
+            		        .orderId(savedOrder.getId())
+            		        .build()
+            	);
+            } catch (Exception e) {
+                log.warn("SMS failed (ORDER_DELIVERED) for order {}", savedOrder.getId());
+            }
+        }
+
+        return savedOrder;
     }
 
     private boolean isValidTransition(OrderStatus current, OrderStatus next) {
@@ -235,8 +295,21 @@ public class OrderService {
 
         order.setDeliveryPersonId(request.getDeliveryPersonId());
         order.setUpdatedAt(LocalDateTime.now());
+        
+        Order savedOrder = orderRepository.save(order);
 
-        return orderRepository.save(order);
+        try {
+            notificationServiceClient.sendDeliveryAssigned(
+                NotificationRequest.builder()
+                    .phone(request.getDeliveryPersonContact())
+                    .orderId(savedOrder.getId())
+                    .build()
+            );
+        } catch (Exception e) {
+            log.warn("SMS failed (DELIVERY_ASSIGNED) for order {}", savedOrder.getId());
+        }
+
+        return savedOrder;
     }
 
     public List<Order> getAssignedOrders(String deliveryPersonId) {
