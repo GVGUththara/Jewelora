@@ -184,15 +184,17 @@ const MyOrders = () => {
                       {order.streetName2 && order.streetName2 + ", "}
                       {order.city}, {order.postalCode}
                     </TableCell>
-                    {order.deliveryPersonId ? (
-                      <>
-                        <TableCell>{order.deliveryPersonName}</TableCell>
-                        <TableCell>{order.deliveryPersonContact}</TableCell>
-                      </>
-                    ) : (
-                      <em>Not Assigned</em>
-                    )}
+                    <TableCell>
+                      {order.deliveryPersonName
+                        ? order.deliveryPersonName
+                        : "-"}
+                    </TableCell>
 
+                    <TableCell>
+                      {order.deliveryPersonContact
+                        ? order.deliveryPersonContact
+                        : "-"}
+                    </TableCell>
                     <TableCell>
                       {order.orderStatus === "DELIVERED" && order.deliveredDate
                         ? new Date(order.deliveredDate).toLocaleDateString()

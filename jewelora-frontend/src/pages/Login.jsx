@@ -62,7 +62,7 @@ export default function Login() {
   };
 
   return (
-    <Box
+    <Box className="auth-page"
       sx={{
         minHeight: "100vh",
         display: "flex",

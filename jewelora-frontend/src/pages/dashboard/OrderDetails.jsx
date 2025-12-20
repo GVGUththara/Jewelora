@@ -57,6 +57,7 @@ const OrderDetails = () => {
   const [newStatus, setNewStatus] = useState("");
   const [deliveryList, setDeliveryList] = useState([]);
   const [selectedDeliveryPerson, setSelectedDeliveryPerson] = useState("");
+  const [selectedDeliveryContact, setSelectedDeliveryContact] = useState("");
 
   const role = localStorage.getItem("role");
 
@@ -124,7 +125,9 @@ const OrderDetails = () => {
     }
   };
 
-  const isLockedOrder = ["DISPATCHED", "DELIVERED"].includes(order?.orderStatus);
+  const isLockedOrder = ["DISPATCHED", "DELIVERED"].includes(
+    order?.orderStatus
+  );
 
   const loadDeliveryPeople = async () => {
     try {
@@ -178,7 +181,10 @@ const OrderDetails = () => {
     try {
       await axiosInstance.put(
         `${ORDER_BASE_URL}/assign-delivery-person/${order.id}`,
-        { deliveryPersonId: selectedDeliveryPerson }
+        {
+          deliveryPersonId: selectedDeliveryPerson,
+          deliveryPersonContact: selectedDeliveryContact,
+        }
       );
 
       await loadOrder();
@@ -405,6 +411,7 @@ const OrderDetails = () => {
                       <MenuItem
                         key={dp.deliveryPersonId}
                         value={dp.deliveryPersonId}
+                        onClick={() => setSelectedDeliveryContact(dp.contactNo)}
                       >
                         {dp.firstName} {dp.lastName} — {dp.contactNo}
                       </MenuItem>

@@ -1,9 +1,44 @@
 import "./../styles/main.css";
 import logo from "./../assets/logo.png";
 import axiosInstance from "../api/axiosInstance";
-import { FaShoppingCart, FaUser } from "react-icons/fa";
+import {
+  FaShoppingCart,
+  FaUser,
+  FaBars,
+  FaTimes,
+  FaHome,
+  FaInfoCircle,
+  FaPhone,
+  FaTruck,
+  FaClipboardCheck,
+} from "react-icons/fa";
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+
+const NavItem = ({
+  href,
+  icon: Icon,
+  children,
+  onClick,
+  setMobileMenuOpen,
+}) => (
+  <a
+    href={href}
+    className="nav-item"
+    onClick={(e) => {
+      if (onClick) {
+        e.preventDefault();
+        onClick();
+      }
+      if (setMobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    }}
+  >
+    {Icon && <Icon className="nav-item-icon" />}
+    <span className="nav-item-text">{children}</span>
+  </a>
+);
 
 export default function Header() {
   const role = localStorage.getItem("role");
@@ -13,40 +48,52 @@ export default function Header() {
 
   const [cartCount, setCartCount] = useState(0);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   const dropdownRef = useRef();
+  const mobileMenuRef = useRef();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setProfileOpen(false);
       }
+      if (
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target) &&
+        !event.target.closest(".mobile-menu-toggle")
+      ) {
+        setMobileMenuOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Cart functionality
   useEffect(() => {
     const handleCartUpdate = async () => {
       const CUSTOMER_ID = localStorage.getItem("userId");
       if (!CUSTOMER_ID) return;
 
       try {
-        // Fetch cart
         const cartRes = await axiosInstance.get(
           `${import.meta.env.VITE_CART_URL}/customer/${CUSTOMER_ID}`
         );
-
         const cartId = cartRes.data.cartId;
-
-        // Fetch items of cart
         const itemsRes = await axiosInstance.get(
           `${import.meta.env.VITE_CART_ITEM_URL}/get-cart-item/${cartId}`
         );
-
         const items = itemsRes.data;
-
-        // Update badge count
         setCartCount(items.reduce((sum, item) => sum + item.quantity, 0));
       } catch (e) {
         console.error("Error loading cart:", e);
@@ -54,9 +101,7 @@ export default function Header() {
     };
 
     handleCartUpdate();
-
     window.addEventListener("cartUpdated", handleCartUpdate);
-
     return () => {
       window.removeEventListener("cartUpdated", handleCartUpdate);
     };
@@ -68,175 +113,176 @@ export default function Header() {
   };
 
   return (
-    <header className="header">
-      <div className="container header-container">
-        <div className="logo-section">
-          <img src={logo} alt="Jewelora Logo" className="logo-img" />
-          <h1 className="brand-name">Jewelora | </h1>
-          <span className="brand-tagline">Elegance in Every Detail</span>
+    <header className={`modern-header ${scrolled ? "scrolled" : ""}`}>
+      <div className="header-container">
+        {/* Logo Section */}
+        <div className="header-brand">
+          <div className="logo-wrapper">
+            <img src={logo} alt="Jewelora Logo" className="modern-logo" />
+            <div className="brand-text">
+              <h1 className="modern-brand-name">Jewelora</h1>
+              <span className="modern-brand-tagline">
+                Elegance in Every Detail
+              </span>
+            </div>
+          </div>
         </div>
 
-        <nav className="navbar-menu">
+        {/* Desktop Navigation */}
+        <nav className="modern-nav desktop-nav">
           {isCustomer && (
             <>
-              {/* <a href="/">Home</a> */}
-              <a href="/browseProducts" className="nav-icon">
+              <NavItem href="/browseProducts" icon={FaHome}>
                 Products
-              </a>
-              <a href="/about" className="nav-icon">
-                About Us
-              </a>
-              <a href="/contact" className="nav-icon">
-                Contact Us
-              </a>
-              <a
-                href="/cart"
-                className="nav-icon"
-                style={{ position: "relative" }}
-              >
-                <FaShoppingCart size={20} />
-                {cartCount > 0 && (
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: -5,
-                      right: -10,
-                      background: "red",
-                      color: "white",
-                      borderRadius: "50%",
-                      padding: "2px 6px",
-                      fontSize: "0.7rem",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {cartCount}
-                  </span>
-                )}
-              </a>
-              <div
-                className="nav-icon"
-                style={{ position: "relative", cursor: "pointer" }}
-                ref={dropdownRef}
-                onClick={() => setProfileOpen((prev) => !prev)}
-              >
-                <FaUser size={20} />
+              </NavItem>
+              <NavItem href="/about" icon={FaInfoCircle}>
+                About
+              </NavItem>
+              <NavItem href="/contact" icon={FaPhone}>
+                Contact
+              </NavItem>
 
-                {profileOpen && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "30px",
-                      right: 0,
-                      background: "white",
-                      boxShadow: "0px 2px 8px rgba(0,0,0,0.15)",
-                      borderRadius: "6px",
-                      overflow: "hidden",
-                      zIndex: 1000,
-                    }}
+              <div className="nav-actions">
+                <a href="/cart" className="cart-button">
+                  <FaShoppingCart className="cart-icon" />
+                  {cartCount > 0 && (
+                    <span className="cart-badge">{cartCount}</span>
+                  )}
+                  <span className="cart-text">Cart</span>
+                </a>
+
+                <div className="profile-dropdown" ref={dropdownRef}>
+                  <button
+                    className="profile-button"
+                    onClick={() => setProfileOpen(!profileOpen)}
                   >
-                    <a
-                      href="/profile"
-                      style={{
-                        display: "block",
-                        padding: "8px 16px",
-                        textDecoration: "none",
-                        color: "#333",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      My Profile
-                    </a>
-                    <a
-                      href="/myOrders"
-                      style={{
-                        display: "block",
-                        padding: "8px 16px",
-                        textDecoration: "none",
-                        color: "#333",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      My Orders
-                    </a>
-                    <div
-                      onClick={handleLogout}
-                      style={{
-                        display: "block",
-                        padding: "8px 16px",
-                        cursor: "pointer",
-                        color: "#333",
-                        borderTop: "1px solid #eee",
-                      }}
-                    >
-                      Logout
+                    <FaUser className="profile-icon" />
+                    <span className="profile-text">Account</span>
+                  </button>
+
+                  {profileOpen && (
+                    <div className="dropdown-menu">
+                      <a href="/profile" className="dropdown-item">
+                        <FaUser className="dropdown-icon" />
+                        My Profile
+                      </a>
+                      <a href="/myOrders" className="dropdown-item">
+                        <FaClipboardCheck className="dropdown-icon" />
+                        My Orders
+                      </a>
+                      <div className="dropdown-divider"></div>
+                      <button
+                        className="dropdown-item logout"
+                        onClick={handleLogout}
+                      >
+                        Logout
+                      </button>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </>
           )}
 
           {isDeliveryPerson && (
             <>
-              <a href="/delivery/assignedOrders" className="nav-icon">
-                Assigned Orders
-              </a>
-              <a href="/delivery/completedOrders" className="nav-icon">
-                Completed Orders
-              </a>
+              <NavItem href="/delivery/assignedOrders" icon={FaTruck}>
+                Assigned
+              </NavItem>
+              <NavItem href="/delivery/completedOrders" icon={FaClipboardCheck}>
+                Completed
+              </NavItem>
 
-              <div
-                className="nav-icon"
-                style={{ position: "relative", cursor: "pointer" }}
-                ref={dropdownRef}
-                onClick={() => setProfileOpen((prev) => !prev)}
-              >
-                <FaUser size={20} />
+              <div className="profile-dropdown" ref={dropdownRef}>
+                <button
+                  className="profile-button"
+                  onClick={() => setProfileOpen(!profileOpen)}
+                >
+                  <FaUser className="profile-icon" />
+                  <span className="profile-text">Account</span>
+                </button>
 
                 {profileOpen && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "30px",
-                      right: 0,
-                      background: "white",
-                      boxShadow: "0px 2px 8px rgba(0,0,0,0.15)",
-                      borderRadius: "6px",
-                      overflow: "hidden",
-                      zIndex: 1000,
-                    }}
-                  >
-                    <a
-                      href="/profile"
-                      style={{
-                        display: "block",
-                        padding: "8px 16px",
-                        textDecoration: "none",
-                        color: "#333",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
+                  <div className="dropdown-menu">
+                    <a href="/profile" className="dropdown-item">
+                      <FaUser className="dropdown-icon" />
                       My Profile
                     </a>
-
-                    <div
+                    <div className="dropdown-divider"></div>
+                    <button
+                      className="dropdown-item logout"
                       onClick={handleLogout}
-                      style={{
-                        display: "block",
-                        padding: "8px 16px",
-                        cursor: "pointer",
-                        color: "#333",
-                        borderTop: "1px solid #eee",
-                      }}
                     >
                       Logout
-                    </div>
+                    </button>
                   </div>
                 )}
               </div>
             </>
           )}
         </nav>
+
+        {/* Mobile Menu Toggle */}
+        <button
+          className="mobile-menu-toggle"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        >
+          {mobileMenuOpen ? <FaTimes /> : <FaBars />}
+        </button>
+
+        {/* Mobile Navigation */}
+        <div
+          ref={mobileMenuRef}
+          className={`mobile-nav ${mobileMenuOpen ? "open" : ""}`}
+        >
+          {isCustomer && (
+            <div className="mobile-nav-content">
+              <NavItem href="/browseProducts" icon={FaHome}>
+                Products
+              </NavItem>
+              <NavItem href="/about" icon={FaInfoCircle}>
+                About Us
+              </NavItem>
+              <NavItem href="/contact" icon={FaPhone}>
+                Contact Us
+              </NavItem>
+              <NavItem href="/cart" icon={FaShoppingCart}>
+                Shopping Cart
+                {cartCount > 0 && (
+                  <span className="mobile-cart-badge">{cartCount}</span>
+                )}
+              </NavItem>
+              <NavItem href="/profile" icon={FaUser}>
+                My Profile
+              </NavItem>
+              <NavItem href="/myOrders" icon={FaClipboardCheck}>
+                My Orders
+              </NavItem>
+              <button className="mobile-logout" onClick={handleLogout}>
+                <FaUser className="logout-icon" />
+                Logout
+              </button>
+            </div>
+          )}
+
+          {isDeliveryPerson && (
+            <div className="mobile-nav-content">
+              <NavItem href="/delivery/assignedOrders" icon={FaTruck}>
+                Assigned Orders
+              </NavItem>
+              <NavItem href="/delivery/completedOrders" icon={FaClipboardCheck}>
+                Completed Orders
+              </NavItem>
+              <NavItem href="/profile" icon={FaUser}>
+                My Profile
+              </NavItem>
+              <button className="mobile-logout" onClick={handleLogout}>
+                <FaUser className="logout-icon" />
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
