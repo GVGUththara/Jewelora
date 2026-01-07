@@ -1,5 +1,5 @@
 server:
-  port: 8080   
+  port: 8080
 
 spring:
   application:
@@ -10,6 +10,36 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: http://localhost:8084/.well-known/jwks.json
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+      routes:
+
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/jewelora/cart/**,
+                   /jewelora/cart-item/**,
+                   /jewelora/orders/**,
+                   /jewelora/order-items/**
+
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+            - Path=/jewelora/product-category/**,
+                   /jewelora/product/**,
+                   /images/**
+
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/jewelora/customer/**,
+                   /jewelora/delivery/**
 
 eureka:
   client:
