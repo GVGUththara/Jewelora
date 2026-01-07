@@ -19,16 +19,14 @@ export default function BrowseProducts() {
   const [products, setProducts] = useState([]);
   const navigate = useNavigate();
 
-  const PRODUCT_BASE_URL = import.meta.env.VITE_PRODUCT_API;
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
   const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_API;
-  const CART_URL = import.meta.env.VITE_CART_URL;
-  const CART_ITEM_URL = import.meta.env.VITE_CART_ITEM_URL;
 
   useEffect(() => {
     const loadProducts = async () => {
       try {
         const res = await axiosInstance.get(
-          `${PRODUCT_BASE_URL}/get-all-product`
+          `${BASE_URL}/product/get-all-product`
         );
         setProducts(res.data);
       } catch (err) {
@@ -47,7 +45,7 @@ export default function BrowseProducts() {
     try {
       const CUSTOMER_ID = localStorage.getItem("userId");
       const cartRes = await axiosInstance.get(
-        `${CART_URL}/customer/${CUSTOMER_ID}`
+        `${BASE_URL}/cart/customer/${CUSTOMER_ID}`
       );
 
       const cartId = cartRes.data.cartId;
@@ -62,7 +60,7 @@ export default function BrowseProducts() {
         productDiscount: product.productDiscount ?? 0,
       };
 
-      await axiosInstance.post(`${CART_ITEM_URL}/add-cart-item`, payload);
+      await axiosInstance.post(`${BASE_URL}/cart-item/add-cart-item`, payload);
 
       Swal.fire({
         icon: "success",

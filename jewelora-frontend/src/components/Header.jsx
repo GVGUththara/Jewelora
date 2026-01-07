@@ -44,7 +44,10 @@ export default function Header() {
   const role = localStorage.getItem("role");
   const isCustomer = role === "CUSTOMER";
   const isDeliveryPerson = role === "DELIVERY_PERSON";
+
   const navigate = useNavigate();
+
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   const [cartCount, setCartCount] = useState(0);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -87,11 +90,11 @@ export default function Header() {
 
       try {
         const cartRes = await axiosInstance.get(
-          `${import.meta.env.VITE_CART_URL}/customer/${CUSTOMER_ID}`
+          `${BASE_URL}/cart/customer/${CUSTOMER_ID}`
         );
         const cartId = cartRes.data.cartId;
         const itemsRes = await axiosInstance.get(
-          `${import.meta.env.VITE_CART_ITEM_URL}/get-cart-item/${cartId}`
+          `${BASE_URL}/cart-item/get-cart-item/${cartId}`
         );
         const items = itemsRes.data;
         setCartCount(items.reduce((sum, item) => sum + item.quantity, 0));

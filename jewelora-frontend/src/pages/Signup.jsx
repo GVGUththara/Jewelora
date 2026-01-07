@@ -35,7 +35,7 @@ export default function Signup() {
     confirmPassword: "",
   });
 
-  const API_BASE_URL = import.meta.env.VITE_CUSTOMER_URL;
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -93,7 +93,7 @@ export default function Signup() {
     }
 
     try {
-      await axios.post(`${API_BASE_URL}/register-customer`, {
+      await axios.post(`${BASE_URL}/customer/register-customer`, {
         firstName,
         lastName,
         email,

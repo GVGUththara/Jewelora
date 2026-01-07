@@ -25,8 +25,7 @@ const Orders = () => {
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
 
-  const ORDER_BASE_URL = import.meta.env.VITE_ORDER_URL;
-  const CUSTOMER_BASE_URL = import.meta.env.VITE_CUSTOMER_URL;
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -63,7 +62,7 @@ const Orders = () => {
   useEffect(() => {
     const loadOrders = async () => {
       try {
-        const res = await axiosInstance.get(`${ORDER_BASE_URL}/get-all-order`);
+        const res = await axiosInstance.get(`${BASE_URL}/orders/get-all-order`);
         const orderList = res.data;
 
         // Fetch customer names for each order
@@ -71,7 +70,7 @@ const Orders = () => {
           orderList.map(async (order) => {
             try {
               const customerRes = await axiosInstance.get(
-                `${CUSTOMER_BASE_URL}/get/${order.customerId}`
+                `${BASE_URL}/customer/get/${order.customerId}`
               );
               const customer = customerRes.data;
 

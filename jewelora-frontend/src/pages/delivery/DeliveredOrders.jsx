@@ -20,8 +20,7 @@ const DeliveredOrders = () => {
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
 
-  const ORDER_URL = import.meta.env.VITE_ORDER_URL;
-  const CUSTOMER_URL = import.meta.env.VITE_CUSTOMER_URL;
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   const deliverPersonId = localStorage.getItem("userId");
 
@@ -55,7 +54,7 @@ const DeliveredOrders = () => {
     const loadOrders = async () => {
       try {
         const res = await axiosInstance.get(
-          `${ORDER_URL}/get-delivered-orders/${deliverPersonId}`
+          `${BASE_URL}/orders/get-delivered-orders/${deliverPersonId}`
         );
         const orderList = res.data;
 
@@ -64,7 +63,7 @@ const DeliveredOrders = () => {
           orderList.map(async (order) => {
             try {
               const customerRes = await axiosInstance.get(
-                `${CUSTOMER_URL}/get/${order.customerId}`
+                `${BASE_URL}/customer/get/${order.customerId}`
               );
               const customer = customerRes.data;
 

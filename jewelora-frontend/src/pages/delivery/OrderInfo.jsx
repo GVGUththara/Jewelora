@@ -47,11 +47,9 @@ const StatusChip = ({ status }) => {
 
 const OrderInfo = () => {
   const { orderId } = useParams();
-  const ORDER_BASE_URL = import.meta.env.VITE_ORDER_URL;
+
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
   const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_API;
-  const PRODUCT_BASE_URL = import.meta.env.VITE_PRODUCT_API;
-  const CUSTOMER_BASE_URL = import.meta.env.VITE_CUSTOMER_URL;
-  const DELIVERY_BASE_API = import.meta.env.VITE_DELIVERY_API;
 
   const [order, setOrder] = useState(null);
   const [newStatus, setNewStatus] = useState("");
@@ -62,7 +60,7 @@ const OrderInfo = () => {
     try {
       // Fetch order
       const res = await axiosInstance.get(
-        `${ORDER_BASE_URL}/get-order/${orderId}`
+        `${BASE_URL}/orders/get-order/${orderId}`
       );
       const orderData = res.data;
 
@@ -70,7 +68,7 @@ const OrderInfo = () => {
       let customerName = "Unknown";
       try {
         const customerRes = await axiosInstance.get(
-          `${CUSTOMER_BASE_URL}/get/${orderData.customerId}`
+          `${BASE_URL}/customer/get/${orderData.customerId}`
         );
         const customer = customerRes.data;
         customerName = `${customer.firstName} ${customer.lastName}`;
@@ -84,7 +82,7 @@ const OrderInfo = () => {
       if (orderData.deliveryPersonId) {
         try {
           const dpRes = await axiosInstance.get(
-            `${DELIVERY_BASE_API}/get-delivery-person/${orderData.deliveryPersonId}`
+            `${BASE_URL}/delivery/get-delivery-person/${orderData.deliveryPersonId}`
           );
           const dp = dpRes.data;
           deliveryPersonName = `${dp.firstName} ${dp.lastName}`;
@@ -99,7 +97,7 @@ const OrderInfo = () => {
         orderData.orderItems.map(async (item) => {
           try {
             const productRes = await axiosInstance.get(
-              `${PRODUCT_BASE_URL}/get-product/${item.productId}`
+              `${BASE_URL}/delivery/product/get-product/${item.productId}`
             );
             const product = productRes.data;
             return { ...item, imageUrl: product.imageUrl || "" };
@@ -160,7 +158,7 @@ const OrderInfo = () => {
   const handleUpdateStatus = async () => {
     try {
       const res = await axiosInstance.put(
-        `${ORDER_BASE_URL}/update-order-status/${order.id}/status`,
+        `${BASE_URL}/orders/update-order-status/${order.id}/status`,
         { newStatus }
       );
 

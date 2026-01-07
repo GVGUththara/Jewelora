@@ -14,8 +14,7 @@ import {
 export default function AddProduct() {
   const navigate = useNavigate();
 
-  const PRODUCT_BASE_URL = import.meta.env.VITE_PRODUCT_API;
-  const CATEGORY_BASE_URL = import.meta.env.VITE_CATEGORY_API;
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   const [categories, setCategories] = useState([]);
 
@@ -64,7 +63,7 @@ export default function AddProduct() {
     const loadCategories = async () => {
       try {
         const res = await axiosInstance.get(
-          `${CATEGORY_BASE_URL}/get-all-category`
+          `${BASE_URL}/product-category/get-all-category`
         );
         setCategories(res.data);
       } catch (err) {
@@ -83,7 +82,7 @@ export default function AddProduct() {
 
   const handleSubmit = async () => {
     try {
-      await axiosInstance.post(`${PRODUCT_BASE_URL}/create-product`, form);
+      await axiosInstance.post(`${BASE_URL}/product/create-product`, form);
 
       Swal.fire({
         title: "Success!",

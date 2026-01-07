@@ -18,16 +18,14 @@ export default function ProductDetails() {
 
   const [product, setProduct] = useState(null);
 
-  const PRODUCT_BASE_URL = import.meta.env.VITE_PRODUCT_API;
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
   const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_API;
-  const CART_URL = import.meta.env.VITE_CART_URL;
-  const CART_ITEM_URL = import.meta.env.VITE_CART_ITEM_URL;
 
   useEffect(() => {
     const loadProduct = async () => {
       try {
         const res = await axiosInstance.get(
-          `${PRODUCT_BASE_URL}/get-product/${id}`
+          `${BASE_URL}/product/get-product/${id}`
         );
         setProduct(res.data);
       } catch (err) {
@@ -53,7 +51,7 @@ export default function ProductDetails() {
       const CUSTOMER_ID = localStorage.getItem("userId");
 
       const cartRes = await axiosInstance.get(
-        `${import.meta.env.VITE_CART_URL}/customer/${CUSTOMER_ID}`
+        `${BASE_URL}/cart/customer/${CUSTOMER_ID}`
       );
 
       const cartId = cartRes.data.cartId;
@@ -69,7 +67,7 @@ export default function ProductDetails() {
       };
 
       await axiosInstance.post(
-        `${import.meta.env.VITE_CART_ITEM_URL}/add-cart-item`,
+        `${BASE_URL}/cart-item/add-cart-item`,
         payload
       );
 

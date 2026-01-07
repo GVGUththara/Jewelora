@@ -20,12 +20,12 @@ import "../../styles/main.css";
 export default function Customers() {
   const [customers, setCustomers] = useState([]);
 
-  const CUSTOMER_BASE_URL = import.meta.env.VITE_CUSTOMER_URL;
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
     const loadCustomers = async () => {
       try {
-        const res = await axiosInstance.get(`${CUSTOMER_BASE_URL}/get-all`);
+        const res = await axiosInstance.get(`${BASE_URL}/customer/get-all`);
         setCustomers(res.data);
       } catch (err) {
         console.error("Error loading customers", err);

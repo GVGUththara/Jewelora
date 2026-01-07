@@ -17,7 +17,8 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 export default function AddDeliveryPerson() {
   const navigate = useNavigate();
-  const DELIVERY_BASE_URL = import.meta.env.VITE_DELIVERY_API;
+  
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -125,7 +126,7 @@ export default function AddDeliveryPerson() {
       };
 
       const res = await axiosInstance.post(
-        `${DELIVERY_BASE_URL}/register-delivery-person`,
+        `${BASE_URL}/delivery/register-delivery-person`,
         payload
       );
 

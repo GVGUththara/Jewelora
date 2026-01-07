@@ -45,10 +45,8 @@ const MyOrders = () => {
   const [orders, setOrders] = useState([]);
   const [openOrder, setOpenOrder] = useState(null);
 
-  const PRODUCT_BASE_URL = import.meta.env.VITE_PRODUCT_API;
-  const ORDER_URL = import.meta.env.VITE_ORDER_URL;
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
   const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_API;
-  const DELIVERY_BASE_API = import.meta.env.VITE_DELIVERY_API;
 
   const customerId = localStorage.getItem("userId");
 
@@ -56,7 +54,7 @@ const MyOrders = () => {
     const fetchOrdersWithImages = async () => {
       try {
         const res = await axiosInstance.get(
-          `${ORDER_URL}/get-order-customer/${customerId}`
+          `${BASE_URL}/orders/get-order-customer/${customerId}`
         );
 
         const ordersData = res.data;
@@ -70,7 +68,7 @@ const MyOrders = () => {
             if (order.deliveryPersonId) {
               try {
                 const dpRes = await axiosInstance.get(
-                  `${DELIVERY_BASE_API}/get-delivery-person/${order.deliveryPersonId}`
+                  `${BASE_URL}/delivery/get-delivery-person/${order.deliveryPersonId}`
                 );
                 const dp = dpRes.data;
                 deliveryPersonName = `${dp.firstName} ${dp.lastName}`;
@@ -85,7 +83,7 @@ const MyOrders = () => {
               order.orderItems.map(async (item) => {
                 try {
                   const productRes = await axiosInstance.get(
-                    `${PRODUCT_BASE_URL}/get-product/${item.productId}`
+                    `${BASE_URL}/product/get-product/${item.productId}`
                   );
                   const product = productRes.data;
                   return { ...item, imageUrl: product.imageUrl || "" };

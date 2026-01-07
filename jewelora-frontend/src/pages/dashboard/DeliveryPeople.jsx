@@ -28,9 +28,7 @@ export default function DeliveryPeople() {
 
   const navigate = useNavigate();
 
-  const DELIVERY_BASE_URL = import.meta.env.VITE_DELIVERY_API;
-  const ORDER_BASE_URL = import.meta.env.VITE_ORDER_URL;
-  const CUSTOMER_BASE_URL = import.meta.env.VITE_CUSTOMER_URL;
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   const STATUS_COLORS = {
     PENDING: "#fbc02d",
@@ -62,7 +60,7 @@ export default function DeliveryPeople() {
     const loadDeliveryPeople = async () => {
       try {
         const res = await axiosInstance.get(
-          `${DELIVERY_BASE_URL}/get-all-delivery-people`
+          `${BASE_URL}/delivery/get-all-delivery-people`
         );
         console.log("Delivery API Response:", res.data);
         setDeliveryPeople(res.data);
@@ -77,7 +75,7 @@ export default function DeliveryPeople() {
   const loadOrders = async (deliveryPersonId) => {
     try {
       const res = await axiosInstance.get(
-        `${ORDER_BASE_URL}/get-orders-by-delivery-person/${deliveryPersonId}`
+        `${BASE_URL}/orders/get-orders-by-delivery-person/${deliveryPersonId}`
       );
 
       const orderList = res.data || [];
@@ -87,7 +85,7 @@ export default function DeliveryPeople() {
         orderList.map(async (order) => {
           try {
             const customerRes = await axiosInstance.get(
-              `${CUSTOMER_BASE_URL}/get/${order.customerId}`
+              `${BASE_URL}/customer/get/${order.customerId}`
             );
             const customer = customerRes.data;
 
@@ -140,7 +138,7 @@ export default function DeliveryPeople() {
 
     try {
       await axiosInstance.delete(
-        `${DELIVERY_BASE_URL}/delete-delivery-person/${deliveryId}`
+        `${BASE_URL}/delivery/delete-delivery-person/${deliveryId}`
       );
 
       setDeliveryPeople(

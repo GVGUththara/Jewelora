@@ -23,15 +23,14 @@ export default function Products() {
   const [categories, setCategories] = useState({});
   const navigate = useNavigate();
 
-  const PRODUCT_BASE_URL = import.meta.env.VITE_PRODUCT_API;
-  const CATEGORY_BASE_URL = import.meta.env.VITE_CATEGORY_API;
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
   const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_API;
 
   useEffect(() => {
     const loadCategories = async () => {
       try {
         const res = await axiosInstance.get(
-          `${CATEGORY_BASE_URL}/get-all-category`
+          `${BASE_URL}/product-category/get-all-category`
         );
 
         const catMap = {};
@@ -47,7 +46,7 @@ export default function Products() {
     const loadProducts = async () => {
       try {
         const res = await axiosInstance.get(
-          `${PRODUCT_BASE_URL}/get-all-product`
+          `${BASE_URL}/product/get-all-product`
         );
         console.log("API Response:", res.data);
         setProducts(res.data);
@@ -83,7 +82,7 @@ export default function Products() {
 
     try {
       await axiosInstance.delete(
-        `${PRODUCT_BASE_URL}/delete-product/${productId}`
+        `${BASE_URL}/product/delete-product/${productId}`
       );
 
       setProducts(products.filter((p) => p.productId !== productId));

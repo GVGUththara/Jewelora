@@ -22,8 +22,8 @@ import Swal from "sweetalert2";
 
 export default function CartPage() {
   const navigate = useNavigate();
-  const CART_URL = import.meta.env.VITE_CART_URL;
-  const CART_ITEM_URL = import.meta.env.VITE_CART_ITEM_URL;
+  
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
   const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_API;
 
   const [cart, setCart] = useState(null);
@@ -35,12 +35,12 @@ export default function CartPage() {
   const loadCart = async () => {
     try {
       const cartRes = await axiosInstance.get(
-        `${CART_URL}/customer/${customerId}`
+        `${BASE_URL}/cart/customer/${customerId}`
       );
       setCart(cartRes.data);
 
       const itemsRes = await axiosInstance.get(
-        `${CART_ITEM_URL}/get-cart-item/${cartRes.data.cartId}`
+        `${BASE_URL}/cart-item/get-cart-item/${cartRes.data.cartId}`
       );
       setCartItems(itemsRes.data);
     } catch (err) {
@@ -62,7 +62,7 @@ export default function CartPage() {
       if (newQty < 1) return;
 
       await axiosInstance.put(
-        `${CART_ITEM_URL}/update-cart-item/${item.cartItemId}`,
+        `${BASE_URL}/cart-item/update-cart-item/${item.cartItemId}`,
         {
           quantity: newQty,
         }
@@ -79,7 +79,7 @@ export default function CartPage() {
 
   const handleDeleteItem = async (itemId) => {
     try {
-      await axiosInstance.delete(`${CART_ITEM_URL}/delete-cart-item/${itemId}`);
+      await axiosInstance.delete(`${BASE_URL}/cart-item/delete-cart-item/${itemId}`);
       Swal.fire({
         icon: "success",
         title: "Item removed",
@@ -97,7 +97,7 @@ export default function CartPage() {
 
   const handleClearCart = async () => {
     try {
-      await axiosInstance.delete(`${CART_URL}/${cart.cartId}/clear`);
+      await axiosInstance.delete(`${BASE_URL}/cart/${cart.cartId}/clear`);
       Swal.fire({
         icon: "success",
         title: "Cart cleared",

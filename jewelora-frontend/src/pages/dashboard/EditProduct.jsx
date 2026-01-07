@@ -15,8 +15,7 @@ export default function EditProduct() {
   const { productId } = useParams();
   const navigate = useNavigate();
 
-  const PRODUCT_BASE_URL = import.meta.env.VITE_PRODUCT_API;
-  const CATEGORY_BASE_URL = import.meta.env.VITE_CATEGORY_API;
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   const [categories, setCategories] = useState([]);
 
@@ -63,7 +62,7 @@ export default function EditProduct() {
     const loadCategories = async () => {
       try {
         const res = await axiosInstance.get(
-          `${CATEGORY_BASE_URL}/get-all-category`
+          `${BASE_URL}/product-category/get-all-category`
         );
         setCategories(res.data);
       } catch {
@@ -74,7 +73,7 @@ export default function EditProduct() {
     const loadProduct = async () => {
       try {
         const res = await axiosInstance.get(
-          `${PRODUCT_BASE_URL}/get-product/${productId}`
+          `${BASE_URL}/product/get-product/${productId}`
         );
         setForm(res.data);
       } catch {
@@ -95,7 +94,7 @@ export default function EditProduct() {
   const handleUpdate = async () => {
     try {
       await axiosInstance.put(
-        `${PRODUCT_BASE_URL}/update-product/${productId}`,
+        `${BASE_URL}/product/update-product/${productId}`,
         form
       );
 

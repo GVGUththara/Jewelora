@@ -19,11 +19,8 @@ import Swal from "sweetalert2";
 export default function CheckoutPage() {
   const navigate = useNavigate();
 
-  const CART_URL = import.meta.env.VITE_CART_URL;
-  const CART_ITEM_URL = import.meta.env.VITE_CART_ITEM_URL;
-  const ORDER_URL = import.meta.env.VITE_ORDER_URL;
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
   const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_API;
-  const CUSTOMER_URL = import.meta.env.VITE_CUSTOMER_URL;
 
   const customerId = localStorage.getItem("userId");
 
@@ -42,17 +39,17 @@ export default function CheckoutPage() {
     const loadCart = async () => {
       try {
         const cartRes = await axiosInstance.get(
-          `${CART_URL}/customer/${customerId}`
+          `${BASE_URL}/cart/customer/${customerId}`
         );
         setCart(cartRes.data);
 
         const itemsRes = await axiosInstance.get(
-          `${CART_ITEM_URL}/get-cart-item/${cartRes.data.cartId}`
+          `${BASE_URL}/cart-item/get-cart-item/${cartRes.data.cartId}`
         );
         setCartItems(itemsRes.data);
 
         const customerRes = await axiosInstance.get(
-          `${CUSTOMER_URL}/get/${customerId}`
+          `${BASE_URL}/customer/get/${customerId}`
         );
 
         const c = customerRes.data;
@@ -110,10 +107,10 @@ export default function CheckoutPage() {
     };
 
     try {
-      await axiosInstance.post(`${ORDER_URL}/create-order`, payload);
+      await axiosInstance.post(`${BASE_URL}/orders/create-order`, payload);
 
       localStorage.removeItem("cart");
-      await axiosInstance.delete(`${CART_URL}/${cart.cartId}/clear`);
+      await axiosInstance.delete(`${BASE_URL}/cart/${cart.cartId}/clear`);
       window.dispatchEvent(new Event("cartUpdated"));
 
       Swal.fire({
