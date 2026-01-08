@@ -29,7 +29,7 @@ The Admin has full system access and can:
 * Perform everything the Inventory Manager can do.
 * Create and manage Inventory Managers.
 * Create and manage Delivery Personnel.
-* View dashboard analytics (to be developed).
+* View dashboard analytics.
 * Generate reports (to be developed).
   
 ### Delivery Person
