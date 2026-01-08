@@ -13,7 +13,7 @@ export default function Sidebar() {
     <aside className="sidebar">
       <ul className="sidebar-menu">
         <li>
-          <Link to="/dashboard">
+          <Link to="/dashboard/analytics">
             <i className="fa-solid fa-chart-line"></i>
             Analytics
           </Link>

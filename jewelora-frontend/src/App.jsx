@@ -1,19 +1,22 @@
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import BrowseProducts from "./pages/BrowseProducts";
-import ProductDetails from "./pages/ProductDetails";
-import Signup from "./pages/Signup";
-import CartPage from "./pages/CartPage";
-import CheckoutPage from "./pages/CheckoutPage";
-import MyOrders from "./pages/MyOrders";
+
+import BrowseProducts from "./pages/customer/BrowseProducts";
+import ProductDetails from "./pages/customer/ProductDetails";
+import Signup from "./pages/customer/Signup";
+import CartPage from "./pages/customer/CartPage";
+import CheckoutPage from "./pages/customer/CheckoutPage";
+import MyOrders from "./pages/customer/MyOrders";
 
 import AssignedOrders from "./pages/delivery/AssignedOrders";
 import DeliveredOrders from "./pages/delivery/DeliveredOrders";
 import OrderInfo from "./pages/delivery/OrderInfo";
 
 import DashboardLayout from "./layouts/DashboardLayout";
+import Analytics from "./pages/dashboard/Analytics";
 import ProductsPage from "./pages/dashboard/Products";
 import EditProduct from "./pages/dashboard/EditProduct";
 import AddProduct from "./pages/dashboard/AddProduct";
@@ -49,6 +52,7 @@ function AppContent() {
 
         {/* Dashboard */}
         <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route path="analytics" element={<Analytics />} />
           <Route path="products" element={<ProductsPage />} />
           <Route path="editProduct/:productId" element={<EditProduct />} />
           <Route path="addProduct" element={<AddProduct />} />

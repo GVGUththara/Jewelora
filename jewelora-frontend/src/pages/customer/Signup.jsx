@@ -1,4 +1,4 @@
-import "./../styles/main.css";
+import "../../styles/main.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";

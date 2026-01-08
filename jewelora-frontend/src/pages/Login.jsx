@@ -51,7 +51,7 @@ export default function Login() {
       window.dispatchEvent(new Event("cartUpdated"));
 
       if (data.role === "CUSTOMER") navigate("/browseProducts");
-      else if (data.role === "ADMIN" || data.role === "INVENTORY_MANAGER") navigate("/dashboard/");
+      else if (data.role === "ADMIN" || data.role === "INVENTORY_MANAGER") navigate("/dashboard/analytics");
       else if (data.role === "DELIVERY_PERSON") navigate("/delivery/assignedOrders");
     } catch (err) {
       console.log(err);
