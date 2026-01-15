@@ -369,279 +369,275 @@ const Analytics = () => {
 
   return (
     <div className="dashboard-content">
-      <Box sx={{ width: "100%", maxWidth: "100%", overflowX: "hidden", p: 2 }}>
-        {/* Header */}
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={3}
-        >
-          <Typography variant="h4" fontWeight="bold" sx={{ color: "#DAA425" }}>
-            Jewelora | Analytics
+      {/* Header */}
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
+        <Typography variant="h4" fontWeight="bold" sx={{ color: "#DAA425" }}>
+          Jewelora | Analytics
+        </Typography>
+        <IconButton onClick={fetchAnalytics} sx={{ color: "#DAA425" }}>
+          <Refresh />
+        </IconButton>
+      </Box>
+
+      {/* ================= SUMMARY CARDS ================= */}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            sm: "1fr 1fr",
+            md: "repeat(4, 1fr)",
+          },
+          gap: 3,
+          mb: 4,
+        }}
+      >
+        <StatCard
+          title="Total Revenue"
+          value={analyticsData?.summary.totalRevenue || 0}
+          icon={AttachMoney}
+          trend={12.5}
+          color="#DAA425"
+        />
+        <StatCard
+          title="Total Orders"
+          value={analyticsData?.summary.totalOrders || 0}
+          icon={ShoppingCart}
+          trend={8.2}
+          subtitle={`${analyticsData?.summary.deliveredOrders || 0} delivered`}
+          color="#1976d2"
+        />
+        <StatCard
+          title="Total Customers"
+          value={analyticsData?.summary.totalCustomers || 0}
+          icon={People}
+          trend={15.3}
+          subtitle={`${analyticsData?.summary.activeCustomers || 0} active`}
+          color="#4caf50"
+        />
+        <StatCard
+          title="Total Products"
+          value={analyticsData?.summary.totalProducts || 0}
+          icon={Inventory}
+          trend={5.7}
+          color="#9c27b0"
+        />
+      </Box>
+
+      {/* ================= CHARTS ROW ================= */}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            md: "3fr 1fr",
+          },
+          gap: 3,
+          mb: 4,
+        }}
+      >
+        <Paper sx={{ p: 3 }}>
+          <Typography variant="h6" fontWeight={600} gutterBottom>
+            Revenue Trend
           </Typography>
-          <IconButton onClick={fetchAnalytics} sx={{ color: "#DAA425" }}>
-            <Refresh />
-          </IconButton>
-        </Box>
-
-        {/* ================= SUMMARY CARDS ================= */}
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: {
-              xs: "1fr",
-              sm: "1fr 1fr",
-              md: "repeat(4, 1fr)",
-            },
-            gap: 3,
-            mb: 4,
-          }}
-        >
-          <StatCard
-            title="Total Revenue"
-            value={analyticsData?.summary.totalRevenue || 0}
-            icon={AttachMoney}
-            trend={12.5}
-            color="#DAA425"
-          />
-          <StatCard
-            title="Total Orders"
-            value={analyticsData?.summary.totalOrders || 0}
-            icon={ShoppingCart}
-            trend={8.2}
-            subtitle={`${
-              analyticsData?.summary.deliveredOrders || 0
-            } delivered`}
-            color="#1976d2"
-          />
-          <StatCard
-            title="Total Customers"
-            value={analyticsData?.summary.totalCustomers || 0}
-            icon={People}
-            trend={15.3}
-            subtitle={`${analyticsData?.summary.activeCustomers || 0} active`}
-            color="#4caf50"
-          />
-          <StatCard
-            title="Total Products"
-            value={analyticsData?.summary.totalProducts || 0}
-            icon={Inventory}
-            trend={5.7}
-            color="#9c27b0"
-          />
-        </Box>
-
-        {/* ================= CHARTS ROW ================= */}
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: {
-              xs: "1fr",
-              md: "3fr 1fr",
-            },
-            gap: 3,
-            mb: 4,
-          }}
-        >
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" fontWeight={600} gutterBottom>
-              Revenue Trend
-            </Typography>
-            <Box sx={{ height: { xs: 250, md: 320 } }}>
-              <Line
-                data={revenueChartData}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: { legend: { display: false } },
-                  scales: {
-                    y: {
-                      beginAtZero: true,
-                      ticks: {
-                        callback: (v) => `LKR ${v.toLocaleString()}`,
-                      },
+          <Box sx={{ height: { xs: 250, md: 320 } }}>
+            <Line
+              data={revenueChartData}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    ticks: {
+                      callback: (v) => `LKR ${v.toLocaleString()}`,
                     },
+                  },
+                },
+              }}
+            />
+          </Box>
+        </Paper>
+
+        <Paper sx={{ p: 3 }}>
+          <Typography variant="h6" fontWeight={600} gutterBottom>
+            Order Status Distribution
+          </Typography>
+          <Box sx={{ height: { xs: 250, md: 320 } }}>
+            <Pie
+              data={orderStatusChartData}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: "right" } },
+              }}
+            />
+          </Box>
+        </Paper>
+      </Box>
+
+      {/* ================= SECOND ROW ================= */}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            md: "2fr 1.5fr 1fr",
+          },
+          gap: 3,
+          mb: 4,
+        }}
+      >
+        {/* Category Distribution */}
+        <Paper sx={{ p: 3 }}>
+          <Typography variant="h6" fontWeight={600} gutterBottom>
+            Category Distribution
+          </Typography>
+          <Box sx={{ height: 260 }}>
+            <Bar
+              data={categoryChartData}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+              }}
+            />
+          </Box>
+        </Paper>
+
+        {/* Top Products */}
+        <Paper sx={{ p: 3 }}>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={2}
+          >
+            <Typography variant="h6" fontWeight={600}>
+              Top Selling Products
+            </Typography>
+            <IconButton size="small">
+              <MoreVert />
+            </IconButton>
+          </Box>
+
+          {analyticsData?.topProducts.map((product, index) => (
+            <Box key={product.productId} mb={2}>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Typography variant="body2" fontWeight={500}>
+                  {index + 1}. {product.productName}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  {product.soldCount || 0} sold
+                </Typography>
+              </Box>
+              <LinearProgress
+                variant="determinate"
+                value={
+                  (product.soldCount /
+                    (analyticsData.topProducts[0]?.soldCount || 1)) *
+                  100
+                }
+                sx={{
+                  height: 6,
+                  borderRadius: 3,
+                  "& .MuiLinearProgress-bar": {
+                    backgroundColor: "#DAA425",
                   },
                 }}
               />
             </Box>
-          </Paper>
+          ))}
+        </Paper>
 
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" fontWeight={600} gutterBottom>
-              Order Status Distribution
-            </Typography>
-            <Box sx={{ height: { xs: 250, md: 320 } }}>
-              <Pie
-                data={orderStatusChartData}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: { legend: { position: "right" } },
-                }}
-              />
-            </Box>
-          </Paper>
-        </Box>
-
-        {/* ================= SECOND ROW ================= */}
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: {
-              xs: "1fr",
-              md: "2fr 1.5fr 1fr",
-            },
-            gap: 3,
-            mb: 4,
-          }}
-        >
-          {/* Category Distribution */}
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" fontWeight={600} gutterBottom>
-              Category Distribution
-            </Typography>
-            <Box sx={{ height: 260 }}>
-              <Bar
-                data={categoryChartData}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: { legend: { display: false } },
-                }}
-              />
-            </Box>
-          </Paper>
-
-          {/* Top Products */}
-          <Paper sx={{ p: 3 }}>
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              mb={2}
-            >
-              <Typography variant="h6" fontWeight={600}>
-                Top Selling Products
-              </Typography>
-              <IconButton size="small">
-                <MoreVert />
-              </IconButton>
-            </Box>
-
-            {analyticsData?.topProducts.map((product, index) => (
-              <Box key={product.productId} mb={2}>
-                <Box
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Typography variant="body2" fontWeight={500}>
-                    {index + 1}. {product.productName}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    {product.soldCount || 0} sold
-                  </Typography>
-                </Box>
-                <LinearProgress
-                  variant="determinate"
-                  value={
-                    (product.soldCount /
-                      (analyticsData.topProducts[0]?.soldCount || 1)) *
-                    100
-                  }
-                  sx={{
-                    height: 6,
-                    borderRadius: 3,
-                    "& .MuiLinearProgress-bar": {
-                      backgroundColor: "#DAA425",
-                    },
-                  }}
-                />
-              </Box>
-            ))}
-          </Paper>
-
-          {/* Key Metrics */}
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" fontWeight={600} gutterBottom>
-              Key Metrics
-            </Typography>
-
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 2,
-              }}
-            >
-              <MetricBox
-                label="Conversion Rate"
-                value={`${analyticsData?.metrics.conversionRate || 0}%`}
-                color="#DAA425"
-              />
-              <MetricBox
-                label="Avg Order Value"
-                value={`LKR ${
-                  analyticsData?.metrics.avgOrderValue?.toFixed(2) || 0
-                }`}
-                color="#1976d2"
-              />
-              <MetricBox
-                label="Pending Orders"
-                value={analyticsData?.summary.pendingOrders || 0}
-                color="#4caf50"
-              />
-              <MetricBox
-                label="Low Stock Items"
-                value={analyticsData?.lowStockProducts?.length || 0}
-                color="#9c27b0"
-              />
-            </Box>
-          </Paper>
-        </Box>
-
-        {/* ================= RECENT ORDERS ================= */}
+        {/* Key Metrics */}
         <Paper sx={{ p: 3 }}>
-          <Typography variant="h6" fontWeight={600} mb={2}>
-            Recent Orders
+          <Typography variant="h6" fontWeight={600} gutterBottom>
+            Key Metrics
           </Typography>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Order ID</TableCell>
-                <TableCell>Customer</TableCell>
-                <TableCell>Amount</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Date</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {analyticsData?.recentOrders.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell>{order.id.slice(0, 8)}...</TableCell>
-                  <TableCell>{order.customerName}</TableCell>
-                  <TableCell>LKR {order.totalAmount?.toFixed(2)}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={order.orderStatus}
-                      size="small"
-                      sx={{
-                        backgroundColor: STATUS_COLORS[order.orderStatus],
-                        color: "#fff",
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    {new Date(order.createdAt).toLocaleDateString()}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 2,
+            }}
+          >
+            <MetricBox
+              label="Conversion Rate"
+              value={`${analyticsData?.metrics.conversionRate || 0}%`}
+              color="#DAA425"
+            />
+            <MetricBox
+              label="Avg Order Value"
+              value={`LKR ${
+                analyticsData?.metrics.avgOrderValue?.toFixed(2) || 0
+              }`}
+              color="#1976d2"
+            />
+            <MetricBox
+              label="Pending Orders"
+              value={analyticsData?.summary.pendingOrders || 0}
+              color="#4caf50"
+            />
+            <MetricBox
+              label="Low Stock Items"
+              value={analyticsData?.lowStockProducts?.length || 0}
+              color="#9c27b0"
+            />
+          </Box>
         </Paper>
       </Box>
+
+      {/* ================= RECENT ORDERS ================= */}
+      <Paper sx={{ p: 3 }}>
+        <Typography variant="h6" fontWeight={600} mb={2}>
+          Recent Orders
+        </Typography>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Order ID</TableCell>
+              <TableCell>Customer</TableCell>
+              <TableCell>Amount</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Date</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {analyticsData?.recentOrders.map((order) => (
+              <TableRow key={order.id}>
+                <TableCell>{order.id.slice(0, 8)}...</TableCell>
+                <TableCell>{order.customerName}</TableCell>
+                <TableCell>LKR {order.totalAmount?.toFixed(2)}</TableCell>
+                <TableCell>
+                  <Chip
+                    label={order.orderStatus}
+                    size="small"
+                    sx={{
+                      backgroundColor: STATUS_COLORS[order.orderStatus],
+                      color: "#fff",
+                    }}
+                  />
+                </TableCell>
+                <TableCell>
+                  {new Date(order.createdAt).toLocaleDateString()}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Paper>
     </div>
   );
 };
