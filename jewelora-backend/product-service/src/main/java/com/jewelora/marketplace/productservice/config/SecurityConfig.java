@@ -22,7 +22,9 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-            	.requestMatchers("/images/**").permitAll()
+            	.requestMatchers(
+            			"/jewelora/product/get-all-product",
+            			"/images/**").permitAll()
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth ->

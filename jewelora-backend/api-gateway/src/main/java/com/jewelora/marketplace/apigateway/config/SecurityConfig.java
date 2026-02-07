@@ -31,8 +31,10 @@ public class SecurityConfig {
             .authorizeExchange(auth -> auth
                 .pathMatchers(
                     "/jewelora/auth/**",
+                    "/jewelora/customer/register-customer/**",
                     "/.well-known/jwks.json",
                     "/eureka/**",
+                    "/jewelora/product/get-all-product",
                     "/images/**" 
                 ).permitAll()
                 .anyExchange().authenticated()
