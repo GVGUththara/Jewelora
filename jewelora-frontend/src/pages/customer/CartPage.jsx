@@ -22,7 +22,7 @@ import Swal from "sweetalert2";
 
 export default function CartPage() {
   const navigate = useNavigate();
-  
+
   const BASE_URL = import.meta.env.VITE_BASE_URL;
   const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_API;
 
@@ -71,7 +71,6 @@ export default function CartPage() {
       loadCart();
 
       window.dispatchEvent(new Event("cartUpdated"));
-      
     } catch (err) {
       console.error("Failed to update quantity", err);
     }
@@ -79,7 +78,9 @@ export default function CartPage() {
 
   const handleDeleteItem = async (itemId) => {
     try {
-      await axiosInstance.delete(`${BASE_URL}/cart-item/delete-cart-item/${itemId}`);
+      await axiosInstance.delete(
+        `${BASE_URL}/cart-item/delete-cart-item/${itemId}`
+      );
       Swal.fire({
         icon: "success",
         title: "Item removed",
@@ -89,7 +90,6 @@ export default function CartPage() {
       loadCart();
 
       window.dispatchEvent(new Event("cartUpdated"));
-
     } catch (err) {
       console.error("Failed to delete item", err);
     }
@@ -145,6 +145,12 @@ export default function CartPage() {
               fontWeight: "bold",
               backgroundColor: "#DAA425",
               "&:hover": { backgroundColor: "#b88a1e" },
+              "&:focus": {
+                outline: "none",
+              },
+              "&:focus-visible": {
+                outline: "none",
+              },
             }}
           >
             Go to Shop
@@ -205,6 +211,14 @@ export default function CartPage() {
                         sx={{ display: "flex", alignItems: "center", gap: 1 }}
                       >
                         <IconButton
+                          sx={{
+                            "&:focus": {
+                              outline: "none",
+                            },
+                            "&:focus-visible": {
+                              outline: "none",
+                            },
+                          }}
                           onClick={() => handleQuantityChange(item, -1)}
                         >
                           <FaMinus />
@@ -213,6 +227,14 @@ export default function CartPage() {
                         <Typography>{item.quantity}</Typography>
 
                         <IconButton
+                          sx={{
+                            "&:focus": {
+                              outline: "none",
+                            },
+                            "&:focus-visible": {
+                              outline: "none",
+                            },
+                          }}
                           onClick={() => handleQuantityChange(item, 1)}
                         >
                           <FaPlus />
@@ -222,6 +244,14 @@ export default function CartPage() {
 
                     <TableCell>
                       <IconButton
+                        sx={{
+                          "&:focus": {
+                            outline: "none",
+                          },
+                          "&:focus-visible": {
+                            outline: "none",
+                          },
+                        }}
                         color="error"
                         onClick={() => handleDeleteItem(item.cartItemId)}
                       >
@@ -268,6 +298,12 @@ export default function CartPage() {
                   borderColor: "#DAA425",
                   backgroundColor: "#DAA425",
                 },
+                "&:focus": {
+                  outline: "none",
+                },
+                "&:focus-visible": {
+                  outline: "none",
+                },
               }}
             >
               Shop More
@@ -280,6 +316,12 @@ export default function CartPage() {
                 fontWeight: "bold",
                 backgroundColor: "#DAA425",
                 "&:hover": { backgroundColor: "#b88a1e" },
+                "&:focus": {
+                  outline: "none",
+                },
+                "&:focus-visible": {
+                  outline: "none",
+                },
               }}
             >
               Checkout
@@ -288,7 +330,15 @@ export default function CartPage() {
               variant="contained"
               color="error"
               onClick={handleClearCart}
-              sx={{ fontWeight: "bold" }}
+              sx={{
+                fontWeight: "bold",
+                "&:focus": {
+                  outline: "none",
+                },
+                "&:focus-visible": {
+                  outline: "none",
+                },
+              }}
             >
               Clear Cart
             </Button>

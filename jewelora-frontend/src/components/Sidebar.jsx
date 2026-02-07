@@ -1,90 +1,142 @@
 import { Link, useNavigate } from "react-router-dom";
-import "./../styles/main.css";
+import {
+  Box,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Button,
+} from "@mui/material";
 
 export default function Sidebar() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Clear user data from localStorage
     localStorage.clear();
     navigate("/login");
   };
+
+  const menuItemStyle = {
+    color: "#fff",
+    "&:hover": {
+      backgroundColor: "#daa425",
+      color: "#000",
+      "& i": {
+        color: "#000",
+      },
+    },
+  };
+
+  const iconStyle = {
+    minWidth: "36px",
+    color: "#fff",
+    fontSize: "18px",
+  };
+
   return (
-    <aside className="sidebar">
-      <ul className="sidebar-menu">
-        <li>
-          <Link to="/dashboard/analytics">
-            <i className="fa-solid fa-chart-line"></i>
-            Analytics
-          </Link>
-        </li>
+    <Box
+      component="aside"
+      sx={{
+        position: "fixed",
+        left: 0,
+        top: "80px",
+        width: "240px",
+        height: "calc(100vh - 80px)",
+        backgroundColor: "#2d2a30",
+        color: "#fff",
+        paddingTop: "50px",
+        overflowY: "auto",
+        borderRight: "2px solid #000",
+      }}
+    >
+      <List>
+        <ListItem disablePadding>
+          <ListItemButton component={Link} to="/dashboard/analytics" sx={menuItemStyle}>
+            <ListItemIcon sx={iconStyle}>
+              <i className="fa-solid fa-chart-line"></i>
+            </ListItemIcon>
+            <ListItemText primary="Analytics" />
+          </ListItemButton>
+        </ListItem>
 
-        <li>
-          <Link to="/dashboard/products">
-            <i className="fa-solid fa-box-open"></i>
-            Products
-          </Link>
-        </li>
+        <ListItem disablePadding>
+          <ListItemButton component={Link} to="/dashboard/products" sx={menuItemStyle}>
+            <ListItemIcon sx={iconStyle}>
+              <i className="fa-solid fa-box-open"></i>
+            </ListItemIcon>
+            <ListItemText primary="Products" />
+          </ListItemButton>
+        </ListItem>
 
-        <li>
-          <Link to="/dashboard/getOrders">
-            <i className="fa-solid fa-cart-shopping"></i>
-            Orders
-          </Link>
-        </li>
+        <ListItem disablePadding>
+          <ListItemButton component={Link} to="/dashboard/getOrders" sx={menuItemStyle}>
+            <ListItemIcon sx={iconStyle}>
+              <i className="fa-solid fa-cart-shopping"></i>
+            </ListItemIcon>
+            <ListItemText primary="Orders" />
+          </ListItemButton>
+        </ListItem>
 
-        <li>
-          <Link to="/dashboard/customers">
-            <i className="fa-solid fa-users"></i>
-            Customers
-          </Link>
-        </li>
+        <ListItem disablePadding>
+          <ListItemButton component={Link} to="/dashboard/customers" sx={menuItemStyle}>
+            <ListItemIcon sx={iconStyle}>
+              <i className="fa-solid fa-users"></i>
+            </ListItemIcon>
+            <ListItemText primary="Customers" />
+          </ListItemButton>
+        </ListItem>
 
-        <li>
-          <Link to="/dashboard/inventory-managers">
-            <i className="fa-solid fa-warehouse"></i>
-            Inventory Managers
-          </Link>
-        </li>
+        <ListItem disablePadding>
+          <ListItemButton component={Link} to="/dashboard/inventory-managers" sx={menuItemStyle}>
+            <ListItemIcon sx={iconStyle}>
+              <i className="fa-solid fa-warehouse"></i>
+            </ListItemIcon>
+            <ListItemText primary="Inventory Managers" />
+          </ListItemButton>
+        </ListItem>
 
-        <li>
-          <Link to="/dashboard/deliveryPeople">
-            <i className="fa-solid fa-motorcycle"></i>
-            Delivery People
-          </Link>
-        </li>
+        <ListItem disablePadding>
+          <ListItemButton component={Link} to="/dashboard/deliveryPeople" sx={menuItemStyle}>
+            <ListItemIcon sx={iconStyle}>
+              <i className="fa-solid fa-motorcycle"></i>
+            </ListItemIcon>
+            <ListItemText primary="Delivery People" />
+          </ListItemButton>
+        </ListItem>
 
-        <li>
-          <Link to="/dashboard/reports">
-            <i className="fa-solid fa-file-invoice"></i>
-            Reports
-          </Link>
-        </li>
-      </ul>
+        <ListItem disablePadding>
+          <ListItemButton component={Link} to="/dashboard/reports" sx={menuItemStyle}>
+            <ListItemIcon sx={iconStyle}>
+              <i className="fa-solid fa-file-invoice"></i>
+            </ListItemIcon>
+            <ListItemText primary="Reports" />
+          </ListItemButton>
+        </ListItem>
+      </List>
 
-      <hr style={{ margin: "20px 0", borderColor: "#ccc" }} />
+      <Divider sx={{ margin: "80px 0", borderColor: "#ccc" }} />
 
       {/* Logout */}
-      <ul className="sidebar-menu">
-        <li>
-          <button
+      <List>
+        <ListItem>
+          <Button
             onClick={handleLogout}
-            style={{
-              all: "unset",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "10px 15px",
+            startIcon={<i className="fa-solid fa-right-from-bracket"></i>}
+            sx={{
               color: "#f44336",
               fontWeight: "bold",
+              justifyContent: "flex-start",
+              textTransform: "none",
+              padding: "10px 15px",
+              width: "100%",
             }}
           >
-            <i className="fa-solid fa-right-from-bracket"></i>
             Logout
-          </button>
-        </li>
-      </ul>
-    </aside>
+          </Button>
+        </ListItem>
+      </List>
+    </Box>
   );
 }

@@ -1,6 +1,19 @@
-import "./../styles/main.css";
 import logo from "./../assets/logo.png";
 import axiosInstance from "../api/axiosInstance";
+import {
+  AppBar,
+  Box,
+  Toolbar,
+  Typography,
+  IconButton,
+  Button,
+  Menu,
+  MenuItem,
+  Divider,
+  Badge,
+  Drawer,
+  Stack,
+} from "@mui/material";
 import {
   FaShoppingCart,
   FaUser,
@@ -9,105 +22,44 @@ import {
   FaHome,
   FaInfoCircle,
   FaPhone,
-  FaTruck,
-  FaClipboardCheck,
+  FaGem,
 } from "react-icons/fa";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const NavItem = ({
-  href,
-  icon: Icon,
-  children,
-  onClick,
-  setMobileMenuOpen,
-}) => (
-  <a
-    href={href}
-    className="nav-item"
-    onClick={(e) => {
-      if (onClick) {
-        e.preventDefault();
-        onClick();
-      }
-      if (setMobileMenuOpen) {
-        setMobileMenuOpen(false);
-      }
-    }}
-  >
-    {Icon && <Icon className="nav-item-icon" />}
-    <span className="nav-item-text">{children}</span>
-  </a>
-);
 
 export default function Header() {
   const role = localStorage.getItem("role");
   const isCustomer = role === "CUSTOMER";
   const isDeliveryPerson = role === "DELIVERY_PERSON";
-
   const navigate = useNavigate();
 
   const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   const [cartCount, setCartCount] = useState(0);
-  const [profileOpen, setProfileOpen] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileAnchor, setProfileAnchor] = useState(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  const dropdownRef = useRef();
-  const mobileMenuRef = useRef();
-
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setProfileOpen(false);
-      }
-      if (
-        mobileMenuRef.current &&
-        !mobileMenuRef.current.contains(event.target) &&
-        !event.target.closest(".mobile-menu-toggle")
-      ) {
-        setMobileMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    const fetchCart = async () => {
+      const id = localStorage.getItem("userId");
+      if (!id) return;
 
-  // Cart functionality
-  useEffect(() => {
-    const handleCartUpdate = async () => {
-      const CUSTOMER_ID = localStorage.getItem("userId");
-      if (!CUSTOMER_ID) return;
-
-      try {
-        const cartRes = await axiosInstance.get(
-          `${BASE_URL}/cart/customer/${CUSTOMER_ID}`
-        );
-        const cartId = cartRes.data.cartId;
-        const itemsRes = await axiosInstance.get(
-          `${BASE_URL}/cart-item/get-cart-item/${cartId}`
-        );
-        const items = itemsRes.data;
-        setCartCount(items.reduce((sum, item) => sum + item.quantity, 0));
-      } catch (e) {
-        console.error("Error loading cart:", e);
-      }
+      const cart = await axiosInstance.get(`${BASE_URL}/cart/customer/${id}`);
+      const items = await axiosInstance.get(
+        `${BASE_URL}/cart-item/get-cart-item/${cart.data.cartId}`
+      );
+      setCartCount(items.data.reduce((s, i) => s + i.quantity, 0));
     };
-
-    handleCartUpdate();
-    window.addEventListener("cartUpdated", handleCartUpdate);
-    return () => {
-      window.removeEventListener("cartUpdated", handleCartUpdate);
-    };
+    fetchCart();
+    window.addEventListener("cartUpdated", fetchCart);
+    return () => window.removeEventListener("cartUpdated", fetchCart);
   }, []);
 
   const handleLogout = () => {
@@ -115,178 +67,290 @@ export default function Header() {
     navigate("/login");
   };
 
+  const navButton = {
+    color: "rgba(255,255,255,0.9)",
+    textTransform: "uppercase",
+    fontSize: "15px",
+    px: 2,
+    "&:hover": {
+      color: "#daa425",
+      background: "rgba(218,164,37,0.1)",
+    },
+  };
+
   return (
-    <header className={`modern-header ${scrolled ? "scrolled" : ""}`}>
-      <div className="header-container">
-        {/* Logo Section */}
-        <div className="header-brand">
-          <div className="logo-wrapper">
-            <img src={logo} alt="Jewelora Logo" className="modern-logo" />
-            <div className="brand-text">
-              <h1 className="modern-brand-name">Jewelora</h1>
-              <span className="modern-brand-tagline">
+    <>
+      <AppBar
+        position="fixed"
+        sx={{
+          background: scrolled ? "rgba(26,26,26,0.98)" : "rgba(45,42,48,0.95)",
+          backdropFilter: "blur(10px)",
+          borderBottom: "1px solid rgba(218,164,37,0.2)",
+          transition: "0.3s",
+        }}
+      >
+        <Toolbar sx={{ height: 80, px: 4 }}>
+          {/* Logo */}
+          <Box display="flex" alignItems="center" gap={2} flex={1}>
+            <img src={logo} height={60} />
+            <Box>
+              <Typography
+                fontSize={28}
+                fontWeight={700}
+                sx={{
+                  background: "linear-gradient(135deg,#fff 0%,#daa425 100%)",
+                  WebkitBackgroundClip: "text",
+                  color: "transparent",
+                }}
+              >
+                Jewelora
+              </Typography>
+              <Typography fontSize={12} color="rgba(255,255,255,0.7)">
                 Elegance in Every Detail
-              </span>
-            </div>
-          </div>
-        </div>
+              </Typography>
+            </Box>
+          </Box>
 
-        {/* Desktop Navigation */}
-        <nav className="modern-nav desktop-nav">
-          {isCustomer && (
-            <>
-              <NavItem href="/browseProducts" icon={FaHome}>
-                Products
-              </NavItem>
-              <NavItem href="/about" icon={FaInfoCircle}>
-                About
-              </NavItem>
-              <NavItem href="/contact" icon={FaPhone}>
-                Contact
-              </NavItem>
-
-              <div className="nav-actions">
-                <a href="/cart" className="cart-button">
-                  <FaShoppingCart className="cart-icon" />
-                  {cartCount > 0 && (
-                    <span className="cart-badge">{cartCount}</span>
-                  )}
-                  <span className="cart-text">Cart</span>
-                </a>
-
-                <div className="profile-dropdown" ref={dropdownRef}>
-                  <button
-                    className="profile-button"
-                    onClick={() => setProfileOpen(!profileOpen)}
-                  >
-                    <FaUser className="profile-icon" />
-                    <span className="profile-text">Account</span>
-                  </button>
-
-                  {profileOpen && (
-                    <div className="dropdown-menu">
-                      <a href="/profile" className="dropdown-item">
-                        <FaUser className="dropdown-icon" />
-                        My Profile
-                      </a>
-                      <a href="/myOrders" className="dropdown-item">
-                        <FaClipboardCheck className="dropdown-icon" />
-                        My Orders
-                      </a>
-                      <div className="dropdown-divider"></div>
-                      <button
-                        className="dropdown-item logout"
-                        onClick={handleLogout}
-                      >
-                        Logout
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </>
-          )}
-
-          {isDeliveryPerson && (
-            <>
-              <NavItem href="/delivery/assignedOrders" icon={FaTruck}>
-                Assigned
-              </NavItem>
-              <NavItem href="/delivery/completedOrders" icon={FaClipboardCheck}>
-                Completed
-              </NavItem>
-
-              <div className="profile-dropdown" ref={dropdownRef}>
-                <button
-                  className="profile-button"
-                  onClick={() => setProfileOpen(!profileOpen)}
+          {/* Desktop Nav */}
+          <Stack
+            direction="row"
+            spacing={2}
+            display={{ xs: "none", md: "flex" }}
+            alignItems="center"
+          >
+            {isCustomer && (
+              <>
+                <Button
+                  sx={navButton}
+                  href="/browseProducts"
+                  startIcon={<FaGem />}
                 >
-                  <FaUser className="profile-icon" />
-                  <span className="profile-text">Account</span>
-                </button>
+                  Products
+                </Button>
+                <Button
+                  sx={navButton}
+                  href="/about"
+                  startIcon={<FaInfoCircle />}
+                >
+                  About
+                </Button>
+                <Button sx={navButton} href="/contact" startIcon={<FaPhone />}>
+                  Contact
+                </Button>
 
-                {profileOpen && (
-                  <div className="dropdown-menu">
-                    <a href="/profile" className="dropdown-item">
-                      <FaUser className="dropdown-icon" />
-                      My Profile
-                    </a>
-                    <div className="dropdown-divider"></div>
-                    <button
-                      className="dropdown-item logout"
-                      onClick={handleLogout}
+                <Button
+                  href="/cart"
+                  sx={{
+                    color: "#fff",
+                    border: "1px solid rgba(218,164,37,0.3)",
+                    borderRadius: "25px",
+                    px: 3,
+                    "&:hover": {
+                      background: "rgba(218, 164, 37, 0.2)",
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 5px 15px rgba(218, 164, 37, 0.2)",
+                      color: "#fff",
+                    },
+                  }}
+                  startIcon={
+                    <Badge badgeContent={cartCount} color="error">
+                      <FaShoppingCart color="#daa425" />
+                    </Badge>
+                  }
+                >
+                  Cart
+                </Button>
+                <Button
+                  onClick={(e) => setProfileAnchor(e.currentTarget)}
+                  sx={{
+                    color: "#fff",
+                    border: "1px solid rgba(218,164,37,0.3)",
+                    borderRadius: "25px",
+                    px: 3,
+                    "&:hover": {
+                      background: "rgba(218, 164, 37, 0.2)",
+                      border: "1px solid rgba(218, 164, 37, 0.3)",
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 5px 15px rgba(218, 164, 37, 0.2)",
+                      color: "#fff",
+                    },
+                  }}
+                  startIcon={<FaUser color="#daa425" />}
+                >
+                  My Account
+                </Button>
+
+                <Menu
+                  anchorEl={profileAnchor}
+                  open={Boolean(profileAnchor)}
+                  onClose={() => setProfileAnchor(null)}
+                  PaperProps={{
+                    sx: {
+                      background: "rgba(26,26,26,0.98)",
+                      border: "1px solid rgba(218,164,37,0.3)",
+                      color: "#fff",
+                    },
+                  }}
+                >
+                  <MenuItem
+                    onClick={() => {
+                      setProfileAnchor(null);
+                      navigate("/profile");
+                    }}
+                  >
+                    MY PROFILE
+                  </MenuItem>
+                  {isCustomer && (
+                    <MenuItem
+                      onClick={() => {
+                        setProfileAnchor(null);
+                        navigate("/myOrders");
+                      }}
                     >
-                      Logout
-                    </button>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-        </nav>
+                      MY ORDERS
+                    </MenuItem>
+                  )}
+                  <Divider />
+                  <MenuItem onClick={handleLogout} sx={{ color: "#ff6b6b" }}>
+                    Logout
+                  </MenuItem>
+                </Menu>
+              </>
+            )}
+            {isDeliveryPerson && (
+              <>
+                <Button
+                  sx={navButton}
+                  onClick={() => navigate("/delivery/assignedOrders")}
+                >
+                  Assigned Orders
+                </Button>
 
-        {/* Mobile Menu Toggle */}
-        <button
-          className="mobile-menu-toggle"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                <Button
+                  sx={navButton}
+                  onClick={() => navigate("/delivery/completedOrders")}
+                >
+                  Completed Orders
+                </Button>
+                <Button
+                  sx={navButton}
+                  onClick={(e) => setProfileAnchor(e.currentTarget)}
+                  startIcon={<FaUser />}
+                >
+                  My Profile
+                </Button>
+                <Menu
+                  anchorEl={profileAnchor}
+                  open={Boolean(profileAnchor)}
+                  onClose={() => setProfileAnchor(null)}
+                  PaperProps={{
+                    sx: {
+                      background: "rgba(26,26,26,0.98)",
+                      border: "1px solid rgba(218,164,37,0.3)",
+                      color: "#fff",
+                    },
+                  }}
+                >
+                  <MenuItem
+                    onClick={() => {
+                      setProfileAnchor(null);
+                      navigate("/profile");
+                    }}
+                  >
+                    MY PROFILE
+                  </MenuItem>
+
+                  <Divider />
+                  <MenuItem onClick={handleLogout} sx={{ color: "#ff6b6b" }}>
+                    Logout
+                  </MenuItem>
+                </Menu>
+              </>
+            )}
+          </Stack>
+
+          {/* Mobile Toggle */}
+          <IconButton
+            sx={{ color: "#fff", display: { md: "none" } }}
+            onClick={() => setMobileOpen(true)}
+          >
+            <FaBars />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+
+      {/* Mobile Drawer */}
+      <Drawer
+        anchor="right"
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+      >
+        <Box
+          sx={{
+            width: 300,
+            height: "100%",
+            background: "rgba(26,26,26,0.98)",
+            p: 3,
+          }}
         >
-          {mobileMenuOpen ? <FaTimes /> : <FaBars />}
-        </button>
+          <IconButton
+            onClick={() => setMobileOpen(false)}
+            sx={{ color: "#fff" }}
+          >
+            <FaTimes />
+          </IconButton>
 
-        {/* Mobile Navigation */}
-        <div
-          ref={mobileMenuRef}
-          className={`mobile-nav ${mobileMenuOpen ? "open" : ""}`}
-        >
-          {isCustomer && (
-            <div className="mobile-nav-content">
-              <NavItem href="/browseProducts" icon={FaHome}>
-                Products
-              </NavItem>
-              <NavItem href="/about" icon={FaInfoCircle}>
-                About Us
-              </NavItem>
-              <NavItem href="/contact" icon={FaPhone}>
-                Contact Us
-              </NavItem>
-              <NavItem href="/cart" icon={FaShoppingCart}>
-                Shopping Cart
-                {cartCount > 0 && (
-                  <span className="mobile-cart-badge">{cartCount}</span>
-                )}
-              </NavItem>
-              <NavItem href="/profile" icon={FaUser}>
-                My Profile
-              </NavItem>
-              <NavItem href="/myOrders" icon={FaClipboardCheck}>
-                My Orders
-              </NavItem>
-              <button className="mobile-logout" onClick={handleLogout}>
-                <FaUser className="logout-icon" />
-                Logout
-              </button>
-            </div>
-          )}
+          <Stack spacing={2} mt={4}>
+            {isCustomer && (
+              <>
+                <Button href="/browseProducts" sx={navButton}>
+                  Products
+                </Button>
+                <Button href="/about" sx={navButton}>
+                  About
+                </Button>
+                <Button href="/contact" sx={navButton}>
+                  Contact
+                </Button>
+                <Button href="/cart" sx={navButton}>
+                  Cart ({cartCount})
+                </Button>
+                <Button href="/profile" sx={navButton}>
+                  My Profile
+                </Button>
+                <Button href="/myOrders" sx={navButton}>
+                  My Orders
+                </Button>
+              </>
+            )}
 
-          {isDeliveryPerson && (
-            <div className="mobile-nav-content">
-              <NavItem href="/delivery/assignedOrders" icon={FaTruck}>
-                Assigned Orders
-              </NavItem>
-              <NavItem href="/delivery/completedOrders" icon={FaClipboardCheck}>
-                Completed Orders
-              </NavItem>
-              <NavItem href="/profile" icon={FaUser}>
-                My Profile
-              </NavItem>
-              <button className="mobile-logout" onClick={handleLogout}>
-                <FaUser className="logout-icon" />
-                Logout
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    </header>
+            {isDeliveryPerson && (
+              <>
+                <Button href="/delivery/assignedOrders" sx={navButton}>
+                  Assigned Orders
+                </Button>
+                <Button href="/delivery/completedOrders" sx={navButton}>
+                  Completed Orders
+                </Button>
+                <Button href="/profile" sx={navButton}>
+                  My Profile
+                </Button>
+              </>
+            )}
+
+            <Button
+              onClick={handleLogout}
+              sx={{
+                color: "#ff6b6b",
+                border: "1px solid rgba(255,107,107,0.3)",
+                "&:hover": { background: "rgba(255,107,107,0.2)" },
+              }}
+            >
+              Logout
+            </Button>
+          </Stack>
+        </Box>
+      </Drawer>
+    </>
   );
 }

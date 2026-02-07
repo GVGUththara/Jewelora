@@ -151,7 +151,7 @@ export default function BrowseProducts() {
                   variant="body1"
                   sx={{ fontWeight: "bold", color: "#333" }}
                 >
-                  Rs. {p.unitPrice}
+                  LKR {p.unitPrice}
                 </Typography>
 
                 <IconButton

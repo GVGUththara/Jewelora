@@ -20,23 +20,20 @@ import {
   Diamond,
   ArrowForward,
   AutoAwesome,
-  LocalShipping,
-  Shield,
   Favorite,
   ShoppingCart,
-  Instagram,
-  Facebook,
-  Twitter,
-  Star,
   ChevronRight,
   ArrowDownward,
   Image as ImageIcon,
 } from "@mui/icons-material";
 
+import backgroundImage from "../assets/background.jpg";
+import axios from "axios";
+
 export default function Home() {
   const navigate = useNavigate();
   const [loaded] = useState(true);
-  const [currentCategory, setCurrentCategory] = useState(0);
+  const [products, setProducts] = useState([]);
   const [floatingIcons] = useState(() =>
     Array.from({ length: 8 }).map((_, i) => ({
       top: `${Math.random() * 100}%`,
@@ -46,47 +43,39 @@ export default function Home() {
       opacity: 0.1 + Math.random() * 0.2,
     }))
   );
-
-  const IMAGE_API = import.meta.env.VITE_IMAGE_API;
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
+  const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_API;
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentCategory((prev) => (prev + 1) % 4);
-    }, 4000);
+    const loadProducts = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/product/get-all-product`);
+        setProducts(res.data);
+      } catch (err) {
+        console.error("Failed to load products", err);
+      }
+    };
 
-    return () => clearInterval(interval);
+    loadProducts();
   }, []);
 
-  const categories = [
-    {
-      name: "Necklaces",
-      icon: "💎",
-      description: "Elegant pieces for every occasion",
-      count: "45+ Items",
-      image: `${IMAGE_API}necklace_2.jpeg`,
-    },
-    {
-      name: "Rings",
-      icon: "💍",
-      description: "Symbols of love and commitment",
-      count: "60+ Items",
-      image: `${IMAGE_API}ring-3.jpeg`,
-    },
-    {
-      name: "Bracelets",
-      icon: "📿",
-      description: "Wristwear that tells a story",
-      count: "35+ Items",
-      image: `${IMAGE_API}bracelet-2.jpeg`,
-    },
-    {
-      name: "Earrings",
-      icon: "✨",
-      description: "Sparkling accents for your style",
-      count: "50+ Items",
-      image: `${IMAGE_API}earrings-5.jpeg`,
-    },
-  ];
+  const visibleCount = 4; // number of cards visible
+  const [slideIndex, setSlideIndex] = useState(0);
+
+  const maxIndex = Math.max(0, products.length - visibleCount);
+
+  const handleNext = () => {
+    setSlideIndex((prev) => (prev < maxIndex ? prev + 1 : 0));
+  };
+
+  const handlePrev = () => {
+    setSlideIndex((prev) => (prev > 0 ? prev - 1 : maxIndex));
+  };
+
+  useEffect(() => {
+    const timer = setInterval(handleNext, 4000);
+    return () => clearInterval(timer);
+  }, [products]);
 
   const testimonials = [
     {
@@ -112,90 +101,28 @@ export default function Home() {
     },
   ];
 
-  const features = [
-    {
-      icon: <Shield fontSize="large" />,
-      title: "Certified Quality",
-      desc: "All pieces certified for purity",
-    },
-    {
-      icon: <LocalShipping fontSize="large" />,
-      title: "Free Shipping",
-      desc: "Free delivery on orders above ₹999",
-    },
-    {
-      icon: <AutoAwesome fontSize="large" />,
-      title: "Lifetime Polish",
-      desc: "Free polishing service forever",
-    },
-    {
-      icon: <Favorite fontSize="large" />,
-      title: "30-Day Returns",
-      desc: "Easy returns within 30 days",
-    },
-  ];
-
-  const bestsellers = [
-    {
-      id: 1,
-      name: "Golden Pearl Necklace",
-      price: "₹2,499",
-      original: "₹3,999",
-      discount: "38% OFF",
-      tag: "BESTSELLER",
-      image: `${IMAGE_API}bestseller-1.jpg`,
-    },
-    {
-      id: 2,
-      name: "Silver Infinity Ring",
-      price: "₹1,299",
-      original: "₹1,999",
-      discount: "35% OFF",
-      tag: "TRENDING",
-      image: `${IMAGE_API}bestseller-2.jpg`,
-    },
-    {
-      id: 3,
-      name: "Diamond Stud Earrings",
-      price: "₹1,799",
-      original: "₹2,499",
-      discount: "28% OFF",
-      tag: "POPULAR",
-      image: `${IMAGE_API}bestseller-3.jpg`,
-    },
-  ];
-
-  const heroBackground = `${IMAGE_API}hero-bg.jpg`;
-
   return (
     <Box sx={{ overflowX: "hidden" }}>
       {/* Hero Section */}
       <Box
         sx={{
           minHeight: "100vh",
-          backgroundImage: heroBackground
-            ? `linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.85)), url(${heroBackground})`
-            : "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)",
+          pt: { xs: "90px", md: "120px" },
+          backgroundImage: `
+      linear-gradient(
+        rgba(255,255,255,0.88),
+        rgba(255,255,255,0.88)
+      ),
+      url(${backgroundImage})
+    `,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          backgroundAttachment: { xs: "scroll", md: "fixed" },
           backgroundRepeat: "no-repeat",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           position: "relative",
           overflow: "hidden",
-          "&::before": {
-            content: '""',
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background:
-              "radial-gradient(circle at 20% 50%, rgba(218, 164, 37, 0.15) 0%, transparent 50%)",
-            zIndex: 1,
-          },
         }}
       >
         {floatingIcons.map((item, i) => (
@@ -265,14 +192,14 @@ export default function Home() {
                   letterSpacing: { xs: 4, md: 6 },
                   color: "#daa425",
                   opacity: 0.9,
-                  fontWeight: 600,
+                  fontWeight: "bold",
                   display: "block",
                   mb: 1,
-                  fontSize: { xs: "0.7rem", md: "0.9rem" },
+                  fontSize: { xs: "1.2rem", md: "1.8rem" },
                   animation: "fadeInUp 1s ease",
                 }}
               >
-                ✨ WELCOME TO ✨
+                WELCOME TO
               </Typography>
 
               {/* Main Title */}
@@ -280,26 +207,10 @@ export default function Home() {
                 variant="h1"
                 sx={{
                   fontWeight: 900,
-                  color: "#fff",
-                  letterSpacing: { xs: 1, md: 2 },
-                  mb: 2,
-                  fontSize: { xs: "2.5rem", sm: "3.5rem", md: "4.5rem" },
-                  textShadow: "0 4px 20px rgba(0,0,0,0.5)",
-                  background: "linear-gradient(45deg, #fff 30%, #daa425 90%)",
+                  color: "#000",
+                  background: "linear-gradient(45deg, #000 30%, #daa425 90%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
-                  position: "relative",
-                  "&::after": {
-                    content: '""',
-                    position: "absolute",
-                    bottom: -10,
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    width: "100px",
-                    height: "3px",
-                    background:
-                      "linear-gradient(90deg, transparent, #daa425, transparent)",
-                  },
                 }}
               >
                 JEWELORA
@@ -308,163 +219,15 @@ export default function Home() {
               {/* Dynamic Tagline */}
               <Typography
                 variant="h5"
-                sx={{
-                  color: "rgba(255,255,255,0.9)",
-                  mb: 1,
-                  fontWeight: 400,
-                  fontSize: { xs: "1.1rem", md: "1.5rem" },
-                }}
+                sx={{ color: "#444", fontWeight: "bold" }}
               >
                 Affordable Luxury for Everyday Elegance
               </Typography>
 
-              <Typography
-                variant="h6"
-                sx={{
-                  color: "rgba(255,255,255,0.7)",
-                  mb: 5,
-                  maxWidth: "700px",
-                  margin: "0 auto",
-                  fontWeight: 300,
-                  lineHeight: 1.6,
-                  fontSize: { xs: "0.9rem", md: "1.1rem" },
-                }}
-              >
+              <Typography variant="h6" sx={{ color: "#444" }}>
                 Discover handcrafted jewelry that combines traditional
-                craftsmanship with modern design. Perfect for daily wear and
-                special occasions.
+                craftsmanship with modern design.
               </Typography>
-
-              {/* Category Showcase */}
-              <Fade in={loaded} timeout={1200}>
-                <Box sx={{ mb: 6 }}>
-                  <Typography
-                    variant="h6"
-                    sx={{ color: "#daa425", mb: 3, fontWeight: 600 }}
-                  >
-                    Featured Categories
-                  </Typography>
-                  <Grid container spacing={3} justifyContent="center">
-                    {categories.map((category, index) => (
-                      <Grid item xs={6} sm={3} key={index}>
-                        <Card
-                          sx={{
-                            background:
-                              index === currentCategory
-                                ? "linear-gradient(135deg, rgba(218,164,37,0.2), rgba(218,164,37,0.05))"
-                                : "rgba(255,255,255,0.05)",
-                            backdropFilter: "blur(10px)",
-                            border: `1px solid ${
-                              index === currentCategory
-                                ? "#daa425"
-                                : "rgba(255,255,255,0.1)"
-                            }`,
-                            borderRadius: "20px",
-                            cursor: "pointer",
-                            transition: "all 0.3s ease",
-                            height: "100%",
-                            minHeight: 180,
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "center",
-                            "&:hover": {
-                              transform: "translateY(-5px)",
-                              borderColor: "#daa425",
-                              boxShadow: "0 10px 30px rgba(218, 164, 37, 0.2)",
-                            },
-                          }}
-                          onClick={() => {
-                            setCurrentCategory(index);
-                            navigate(
-                              "/products?category=" +
-                                category.name.toLowerCase()
-                            );
-                          }}
-                        >
-                          <CardContent sx={{ textAlign: "center", p: 3 }}>
-                            <Typography variant="h2" sx={{ mb: 1 }}>
-                              {category.icon}
-                            </Typography>
-                            <Typography
-                              variant="h6"
-                              sx={{ color: "#fff", mb: 0.5 }}
-                            >
-                              {category.name}
-                            </Typography>
-                            <Typography
-                              variant="caption"
-                              sx={{
-                                color: "rgba(255,255,255,0.7)",
-                                display: "block",
-                              }}
-                            >
-                              {category.description}
-                            </Typography>
-                            <Chip
-                              label={category.count}
-                              size="small"
-                              sx={{
-                                mt: 2,
-                                backgroundColor: "rgba(218,164,37,0.2)",
-                                color: "#daa425",
-                                fontWeight: 600,
-                              }}
-                            />
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Box>
-              </Fade>
-
-              {/* Enhanced Features */}
-              <Stack
-                direction={{ xs: "column", sm: "row" }}
-                spacing={3}
-                justifyContent="center"
-                sx={{ mb: 6 }}
-              >
-                {features.map((feature, index) => (
-                  <Fade in={loaded} timeout={1000 + index * 200} key={index}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        gap: 1,
-                        color: "rgba(255,255,255,0.9)",
-                        backgroundColor: "rgba(255,255,255,0.05)",
-                        padding: { xs: "16px", md: "24px" },
-                        borderRadius: "20px",
-                        backdropFilter: "blur(10px)",
-                        border: "1px solid rgba(218, 164, 37, 0.1)",
-                        minWidth: { xs: "100%", sm: "200px" },
-                        transition: "all 0.3s ease",
-                        "&:hover": {
-                          transform: "translateY(-5px)",
-                          borderColor: "#daa425",
-                          backgroundColor: "rgba(218, 164, 37, 0.05)",
-                        },
-                      }}
-                    >
-                      <Box sx={{ color: "#daa425" }}>{feature.icon}</Box>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                        {feature.title}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: "rgba(255,255,255,0.7)",
-                          textAlign: "center",
-                        }}
-                      >
-                        {feature.desc}
-                      </Typography>
-                    </Box>
-                  </Fade>
-                ))}
-              </Stack>
 
               {/* Action Buttons */}
               <Stack
@@ -472,14 +235,14 @@ export default function Home() {
                 spacing={3}
                 justifyContent="center"
                 alignItems="center"
-                sx={{ mb: 4 }}
+                sx={{ mb: 4, mt: 5 }}
               >
                 <Fade in={loaded} timeout={1800}>
                   <Button
                     variant="outlined"
                     size="large"
-                    onClick={() => navigate("/products")}
-                    endIcon={<ArrowForward />}
+                    onClick={() => navigate("/login")}
+                    endIcon={<ShoppingCart />}
                     sx={{
                       color: "#daa425",
                       borderColor: "rgba(218, 164, 37, 0.5)",
@@ -497,6 +260,12 @@ export default function Home() {
                         boxShadow: "0 15px 30px rgba(218, 164, 37, 0.3)",
                       },
                       transition: "all 0.3s ease",
+                      "&:focus": {
+                        outline: "none",
+                      },
+                      "&:focus-visible": {
+                        outline: "none",
+                      },
                     }}
                   >
                     SHOP NOW
@@ -512,46 +281,56 @@ export default function Home() {
                     <Button
                       variant="contained"
                       size="large"
-                      onClick={() => navigate("/login")}
-                      startIcon={<ShoppingCart />}
+                      startIcon={<ArrowForward />}
+                      onClick={() => {
+                        document
+                          .getElementById("collections")
+                          ?.scrollIntoView({ behavior: "smooth" });
+                      }}
                       sx={{
                         backgroundColor: "#daa425",
                         color: "#000",
+                        fontWeight: 700,
+                        borderRadius: "30px",
+                        "&:focus": {
+                          outline: "none",
+                        },
+                        "&:focus-visible": {
+                          outline: "none",
+                        },
+                      }}
+                    >
+                      VIEW COLLECTION
+                    </Button>
+
+                    <Button
+                      variant="outlined"
+                      size="large"
+                      startIcon={<Favorite />}
+                      onClick={() => navigate("/signup")}
+                      sx={{
+                        color: "#000",
+                        borderColor: "rgba(0, 0, 0, 0.5)",
                         px: { xs: 4, md: 4 },
                         py: 1.5,
                         borderRadius: "30px",
                         fontSize: { xs: "0.9rem", md: "1rem" },
                         fontWeight: 700,
+                        borderWidth: "2px",
                         minWidth: { xs: "100%", sm: "auto" },
                         "&:hover": {
-                          backgroundColor: "#c4931f",
+                          borderColor: "#000",
+                          backgroundColor: "rgba(0, 0, 0, 0.1)",
                           transform: "translateY(-3px)",
-                          boxShadow: "0 15px 30px rgba(218, 164, 37, 0.5)",
+                          boxShadow: "0 15px 30px rgba(0, 0, 0, 0.3)",
                         },
                         transition: "all 0.3s ease",
-                      }}
-                    >
-                      QUICK BUY
-                    </Button>
-
-                    <Button
-                      variant="text"
-                      size="large"
-                      onClick={() => navigate("/signup")}
-                      startIcon={<Favorite />}
-                      sx={{
-                        color: "#fff",
-                        px: { xs: 4, md: 4 },
-                        py: 1.5,
-                        borderRadius: "30px",
-                        fontSize: { xs: "0.9rem", md: "1rem" },
-                        fontWeight: 600,
-                        minWidth: { xs: "100%", sm: "auto" },
-                        "&:hover": {
-                          backgroundColor: "rgba(255,255,255,0.15)",
-                          transform: "translateY(-3px)",
+                        "&:focus": {
+                          outline: "none",
                         },
-                        transition: "all 0.3s ease",
+                        "&:focus-visible": {
+                          outline: "none",
+                        },
                       }}
                     >
                       CREATE ACCOUNT
@@ -652,13 +431,12 @@ export default function Home() {
         </Container>
       </Box>
 
-      {/* Featured Products Section */}
       <Container
-        id="featured-products"
-        maxWidth="lg"
+        id="collections"
         sx={{
           py: { xs: 6, md: 10 },
-          px: { xs: 2, md: 3 },
+          width: "100vw",
+          position: "relative",
         }}
       >
         <Typography
@@ -666,179 +444,166 @@ export default function Home() {
           sx={{
             mb: 6,
             fontWeight: 800,
-            color: "#333",
             textAlign: "center",
-            position: "relative",
-            "&::after": {
-              content: '""',
-              position: "absolute",
-              bottom: -10,
-              left: "50%",
-              transform: "translateX(-50%)",
-              width: "80px",
-              height: "3px",
-              background:
-                "linear-gradient(90deg, transparent, #daa425, transparent)",
-            },
+            color: "#333",
           }}
         >
-          🏆 Customer Favorites
+          Our Signature Collections
         </Typography>
 
-        <Grid container spacing={4}>
-          {bestsellers.map((product) => (
-            <Grid item xs={12} sm={6} md={4} key={product.id}>
-              <Fade in={loaded} timeout={1000}>
-                <Card
+        <Box sx={{ position: "relative", overflow: "hidden" }}>
+          {/* LEFT ARROW */}
+          <IconButton
+            onClick={handlePrev}
+            sx={{
+              position: "absolute",
+              left: 15,
+              top: "50%",
+              transform: "translateY(-50%)",
+              zIndex: 2,
+              backgroundColor: "#fff",
+              boxShadow: 2,
+              "&:hover": { backgroundColor: "#f5f5f5" },
+              "&:focus": {
+                outline: "none",
+              },
+              "&:focus-visible": {
+                outline: "none",
+              },
+            }}
+          >
+            <ChevronRight sx={{ transform: "rotate(180deg)" }} />
+          </IconButton>
+
+          {/* SLIDER */}
+          <Box
+            sx={{
+              display: "flex",
+              transition: "transform 0.6s ease",
+              transform: `translateX(-${slideIndex * (100 / visibleCount)}%)`,
+              width: "flex",
+              height: "450px",
+            }}
+          >
+            {products.map((product) => {
+              const discountedPrice =
+                product.productDiscount > 0
+                  ? Math.round(
+                      product.unitPrice -
+                        (product.unitPrice * product.productDiscount) / 100
+                    )
+                  : product.unitPrice;
+
+              return (
+                <Box
+                  key={product.productId}
                   sx={{
-                    borderRadius: "20px",
-                    overflow: "hidden",
-                    border: "2px solid #f5f5f5",
-                    transition: "all 0.3s ease",
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    "&:hover": {
-                      transform: "translateY(-10px)",
-                      borderColor: "#daa425",
-                      boxShadow: "0 20px 40px rgba(218, 164, 37, 0.15)",
-                      "& .product-image": {
-                        transform: "scale(1.05)",
-                      },
-                    },
+                    px: 1.5,
                   }}
                 >
-                  {/* Product Image */}
-                  <Box
+                  {/* CARD */}
+                  <Card
                     sx={{
-                      height: 220,
-                      backgroundColor: "rgba(218, 164, 37, 0.05)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
+                      height: 420,
+                      width: 300,
                       position: "relative",
                       overflow: "hidden",
+                      display: "flex",
+                      flexDirection: "column",
+                      transition: "transform 0.3s",
+                      "&:hover": { transform: "translateY(-6px)" },
                     }}
-                    className="product-image"
                   >
-                    {product.image ? (
-                      <Box
-                        component="img"
-                        src={product.image}
-                        alt={product.name}
-                        sx={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                          transition: "transform 0.5s ease",
-                        }}
-                        onError={(e) => {
-                          e.target.style.display = "none";
-                          e.target.parentElement.innerHTML = `
-                            <div style="display: flex; flex-direction: column; align-items: center; color: #daa425;">
-                              <ImageIcon sx={{ fontSize: 60, opacity: 0.3 }} />
-                              <Typography variant="caption" sx={{ mt: 1, color: '#daa425' }}>
-                                ${product.name}
-                              </Typography>
-                            </div>
-                          `;
-                        }}
-                      />
-                    ) : (
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          color: "#daa425",
-                        }}
-                      >
-                        <ImageIcon sx={{ fontSize: 60, opacity: 0.3 }} />
-                        <Typography
-                          variant="caption"
-                          sx={{ mt: 1, color: "#daa425" }}
-                        >
-                          {product.name}
-                        </Typography>
-                      </Box>
-                    )}
-                    <Chip
-                      label={product.tag}
-                      size="small"
+                    {/* IMAGE */}
+                    <Box
+                      component="img"
+                      src={IMAGE_BASE_URL + product.imageUrl}
+                      alt={product.productName}
                       sx={{
-                        position: "absolute",
-                        top: 16,
-                        left: 16,
-                        backgroundColor: "#daa425",
-                        color: "#000",
-                        fontWeight: 700,
-                        fontSize: "0.7rem",
+                        height: 260,
+                        width: "100%",
+                        objectFit: "cover",
                       }}
                     />
-                  </Box>
 
-                  <CardContent sx={{ flexGrow: 1, p: 3 }}>
-                    <Typography
-                      variant="h6"
-                      sx={{ fontWeight: 700, mb: 1, color: "#333" }}
-                    >
-                      {product.name}
-                    </Typography>
-
-                    <Stack
-                      direction="row"
-                      alignItems="center"
-                      spacing={1}
-                      sx={{ mb: 2 }}
-                    >
-                      <Typography
-                        variant="h5"
-                        sx={{ color: "#daa425", fontWeight: 800 }}
-                      >
-                        {product.price}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ color: "#999", textDecoration: "line-through" }}
-                      >
-                        {product.original}
-                      </Typography>
+                    {/* DISCOUNT BADGE */}
+                    {product.productDiscount > 0 && (
                       <Chip
-                        label={product.discount}
-                        size="small"
+                        label={`${product.productDiscount}% OFF`}
                         sx={{
-                          backgroundColor: "rgba(218, 164, 37, 0.1)",
-                          color: "#daa425",
-                          fontWeight: 600,
-                          fontSize: "0.7rem",
+                          position: "absolute",
+                          top: 12,
+                          left: 12,
+                          zIndex: 2,
+                          backgroundColor: "#daa425",
+                          color: "#fff",
+                          fontWeight: "bold",
                         }}
                       />
-                    </Stack>
+                    )}
 
-                    <Button
-                      fullWidth
-                      variant="contained"
-                      startIcon={<ShoppingCart />}
-                      onClick={() => navigate(`/product/${product.id}`)}
-                      sx={{
-                        backgroundColor: "#daa425",
-                        color: "#000",
-                        fontWeight: 700,
-                        borderRadius: "30px",
-                        py: 1,
-                        "&:hover": {
-                          backgroundColor: "#c4931f",
-                        },
-                      }}
-                    >
-                      ADD TO CART
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Fade>
-            </Grid>
-          ))}
-        </Grid>
+                    {/* CONTENT */}
+                    <CardContent sx={{ textAlign: "center", flexGrow: 1 }}>
+                      <Typography fontWeight={700}>
+                        {product.productName}
+                      </Typography>
+
+                      {product.productDiscount > 0 ? (
+                        <>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              textDecoration: "line-through",
+                              color: "#777",
+                            }}
+                          >
+                            LKR {product.unitPrice}
+                          </Typography>
+                          <Typography
+                            variant="h6"
+                            sx={{ color: "#daa425", fontWeight: 800 }}
+                          >
+                            LKR {discountedPrice}
+                          </Typography>
+                        </>
+                      ) : (
+                        <Typography
+                          variant="h6"
+                          sx={{ color: "#daa425", fontWeight: 800 }}
+                        >
+                          LKR {product.unitPrice}
+                        </Typography>
+                      )}
+                    </CardContent>
+                  </Card>
+                </Box>
+              );
+            })}
+          </Box>
+
+          {/* RIGHT ARROW */}
+          <IconButton
+            onClick={handleNext}
+            sx={{
+              position: "absolute",
+              right: 15,
+              top: "50%",
+              transform: "translateY(-50%)",
+              zIndex: 2,
+              backgroundColor: "#fff",
+              boxShadow: 2,
+              "&:hover": { backgroundColor: "#f5f5f5" },
+              "&:focus": {
+                outline: "none",
+              },
+              "&:focus-visible": {
+                outline: "none",
+              },
+            }}
+          >
+            <ChevronRight />
+          </IconButton>
+        </Box>
       </Container>
 
       {/* Testimonials Section */}
@@ -865,7 +630,7 @@ export default function Home() {
               },
             }}
           >
-            ❤️ What Our Customers Say
+            What Our Customers Say
           </Typography>
 
           <Grid container spacing={4}>
@@ -960,7 +725,7 @@ export default function Home() {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                background: "url('" + IMAGE_API + "pattern.png" + "')",
+
                 opacity: 0.1,
                 backgroundSize: "cover",
               },
@@ -1005,6 +770,12 @@ export default function Home() {
                   transition: "all 0.3s ease",
                   position: "relative",
                   zIndex: 1,
+                  "&:focus": {
+                    outline: "none",
+                  },
+                  "&:focus-visible": {
+                    outline: "none",
+                  },
                 }}
               >
                 START SHOPPING
@@ -1030,6 +801,12 @@ export default function Home() {
                   transition: "all 0.3s ease",
                   position: "relative",
                   zIndex: 1,
+                  "&:focus": {
+                    outline: "none",
+                  },
+                  "&:focus-visible": {
+                    outline: "none",
+                  },
                 }}
               >
                 CREATE ACCOUNT
@@ -1038,69 +815,6 @@ export default function Home() {
           </Box>
         </Fade>
       </Container>
-
-      {/* Footer */}
-      <Box
-        sx={{
-          backgroundColor: "#1a1a1a",
-          color: "rgba(255,255,255,0.7)",
-          py: 4,
-          textAlign: "center",
-          borderTop: "1px solid rgba(218, 164, 37, 0.2)",
-        }}
-      >
-        <Container maxWidth="lg">
-          <Stack
-            direction="row"
-            spacing={3}
-            justifyContent="center"
-            sx={{ mb: 3 }}
-          >
-            <IconButton
-              sx={{
-                color: "#daa425",
-                "&:hover": {
-                  backgroundColor: "rgba(218, 164, 37, 0.1)",
-                  transform: "translateY(-2px)",
-                },
-              }}
-            >
-              <Instagram />
-            </IconButton>
-            <IconButton
-              sx={{
-                color: "#daa425",
-                "&:hover": {
-                  backgroundColor: "rgba(218, 164, 37, 0.1)",
-                  transform: "translateY(-2px)",
-                },
-              }}
-            >
-              <Facebook />
-            </IconButton>
-            <IconButton
-              sx={{
-                color: "#daa425",
-                "&:hover": {
-                  backgroundColor: "rgba(218, 164, 37, 0.1)",
-                  transform: "translateY(-2px)",
-                },
-              }}
-            >
-              <Twitter />
-            </IconButton>
-          </Stack>
-          <Typography
-            variant="body2"
-            sx={{ color: "rgba(255,255,255,0.5)", mb: 1 }}
-          >
-            © {new Date().getFullYear()} Jewelora. All rights reserved.
-          </Typography>
-          <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.4)" }}>
-            Crafted with ❤️ for jewelry lovers everywhere
-          </Typography>
-        </Container>
-      </Box>
 
       {/* Global animations */}
       <style>{`

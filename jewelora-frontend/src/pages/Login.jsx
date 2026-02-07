@@ -51,8 +51,10 @@ export default function Login() {
       window.dispatchEvent(new Event("cartUpdated"));
 
       if (data.role === "CUSTOMER") navigate("/browseProducts");
-      else if (data.role === "ADMIN" || data.role === "INVENTORY_MANAGER") navigate("/dashboard/analytics");
-      else if (data.role === "DELIVERY_PERSON") navigate("/delivery/assignedOrders");
+      else if (data.role === "ADMIN" || data.role === "INVENTORY_MANAGER")
+        navigate("/dashboard/analytics");
+      else if (data.role === "DELIVERY_PERSON")
+        navigate("/delivery/assignedOrders");
     } catch (err) {
       console.log(err);
       setErrorMsg(
@@ -62,7 +64,7 @@ export default function Login() {
   };
 
   return (
-    <Box className="auth-page"
+    <Box
       sx={{
         minHeight: "100vh",
         display: "flex",
@@ -141,6 +143,12 @@ export default function Login() {
             color: "#000",
             fontWeight: "bold",
             "&:hover": { bgcolor: "#F2CA46" },
+            "&:focus": {
+              outline: "none",
+            },
+            "&:focus-visible": {
+              outline: "none",
+            },
           }}
           onClick={handleLogin}
         >
@@ -153,11 +161,8 @@ export default function Login() {
           onClick={() => navigate("/signup")}
         >
           Don't have an account?{" "}
-          <span style={{ color: "#DAA425", fontWeight: "bold" }}>
-            Sign Up
-          </span>
+          <span style={{ color: "#DAA425", fontWeight: "bold" }}>Sign Up</span>
         </Typography>
-        
       </Paper>
     </Box>
   );
